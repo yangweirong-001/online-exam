@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本科英语（一）· 对话填空修复版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f4fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.07);
+            padding: 30px 35px;
+        }
+        h1 {
+            font-size: 28px;
+            color: #0b1e33;
+            border-left: 6px solid #1a6fb5;
+            padding-left: 18px;
+            margin-bottom: 2px;
+        }
+        .sub {
+            color: #5a6f84;
+            font-size: 15px;
+            padding-left: 24px;
+            margin-bottom: 22px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .tabs button {
+            border: none;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            background: #e6edf6;
+            color: #1f3a5f;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tabs button.active {
+            background: #1a3a5e;
+            color: white;
+            box-shadow: 0 4px 10px rgba(26, 55, 94, 0.25);
+        }
+        .tabs button:hover:not(.active) {
+            background: #d3deed;
+        }
+
+        .progress-wrap {
+            background: #e6edf6;
+            border-radius: 40px;
+            height: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #1a6fb5, #58a9e8);
+            border-radius: 40px;
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #1f2e41;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+        }
+        .stats span {
+            background: #f0f5fc;
+            padding: 3px 16px;
+            border-radius: 30px;
+        }
+        .stats .right {
+            color: #1a7a5e;
+        }
+        .stats .wrong {
+            color: #b1422e;
+        }
+
+        .dialogue-block {
+            background: #fafdff;
+            border: 1px solid #dfe8f2;
+            border-radius: 18px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            transition: 0.15s;
+        }
+        .dialogue-block.correct {
+            border-left: 6px solid #1f9a7a;
+            background: #f2fcf8;
+        }
+        .dialogue-block.wrong {
+            border-left: 6px solid #d95b43;
+            background: #fdf6f2;
+        }
+        .dialogue-block.unanswered {
+            border-left: 6px solid #c8d4e3;
+        }
+
+        .dialogue-title {
+            font-weight: 700;
+            font-size: 17px;
+            color: #11212e;
+            margin-bottom: 12px;
+        }
+        .dialogue-text {
+            background: #f3f8ff;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 2;
+            color: #1a2d3f;
+            border-left: 3px solid #7aa9d9;
+            margin-bottom: 14px;
+        }
+        .dialogue-text .blank {
+            display: inline-block;
+            background: #ffe8b0;
+            padding: 0 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #8a5f00;
+            min-width: 28px;
+            text-align: center;
+        }
+        .dialogue-text .blank.filled {
+            background: #c8e6c9;
+            color: #1e6b2b;
+        }
+        .dialogue-text .blank.filled-wrong {
+            background: #ffcdd2;
+            color: #a13026;
+        }
+
+        .blank-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 30px;
+            margin: 6px 0 12px;
+            padding: 12px 16px;
+            background: #f7faff;
+            border-radius: 14px;
+            border: 1px solid #e2ebf5;
+        }
+        .blank-selector .blank-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .blank-selector .blank-item label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1f3a5f;
+        }
+        .blank-selector .blank-item select {
+            padding: 5px 10px;
+            border-radius: 30px;
+            border: 1.5px solid #c5d4e6;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 110px;
+        }
+        .blank-selector .blank-item select:focus {
+            outline: none;
+            border-color: #1a6fb5;
+            box-shadow: 0 0 0 3px rgba(26, 111, 181, 0.15);
+        }
+        .blank-selector .blank-item select.correct {
+            border-color: #1f9a7a;
+            background: #e6f7f0;
+        }
+        .blank-selector .blank-item select.wrong {
+            border-color: #d95b43;
+            background: #fdeee8;
+        }
+
+        .btn-check {
+            border: none;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 15px;
+            background: #1a3a5e;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 4px 0 8px;
+        }
+        .btn-check:hover {
+            background: #112b45;
+        }
+
+        .feedback-dialogue {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            display: none;
+            background: #f0f5fc;
+        }
+        .feedback-dialogue.show {
+            display: block;
+        }
+        .feedback-dialogue.correct {
+            background: #def5ed;
+            color: #136b56;
+        }
+        .feedback-dialogue.wrong {
+            background: #fce8e0;
+            color: #9e3f2b;
+        }
+        .feedback-dialogue .detail {
+            margin-top: 6px;
+            font-size: 13px;
+            color: #1f3a5f;
+        }
+        .feedback-dialogue .detail .ok {
+            color: #1a7a5e;
+        }
+        .feedback-dialogue .detail .fail {
+            color: #b1422e;
+        }
+
+        .other-block {
+            background: #fafdff;
+            border: 1px solid #dfe8f2;
+            border-radius: 18px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            transition: 0.15s;
+        }
+        .other-block.correct {
+            border-left: 6px solid #1f9a7a;
+            background: #f2fcf8;
+        }
+        .other-block.wrong {
+            border-left: 6px solid #d95b43;
+            background: #fdf6f2;
+        }
+        .other-block.unanswered {
+            border-left: 6px solid #c8d4e3;
+        }
+        .q-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #11212e;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .q-type {
+            display: inline-block;
+            background: #d3e0ef;
+            font-size: 11px;
+            padding: 0 12px;
+            border-radius: 30px;
+            color: #1f3a5f;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f2f7fe;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.12s;
+            border: 1.5px solid transparent;
+            font-size: 15px;
+        }
+        .option-label:hover {
+            background: #e6eefa;
+        }
+        .option-label input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #1a6fb5;
+            flex-shrink: 0;
+        }
+        .option-label.selected {
+            border-color: #1a6fb5;
+            background: #e1edfc;
+        }
+        .option-label.correct-answer {
+            border-color: #1f9a7a;
+            background: #d5f5ec;
+        }
+        .option-label.wrong-answer {
+            border-color: #d95b43;
+            background: #fce6de;
+        }
+
+        .feedback {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            display: none;
+            background: #f0f5fc;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .feedback.correct {
+            background: #def5ed;
+            color: #136b56;
+        }
+        .feedback.wrong {
+            background: #fce8e0;
+            color: #9e3f2b;
+        }
+        .feedback .correct-ans {
+            font-weight: 600;
+            color: #136b56;
+        }
+
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 28px 0 10px;
+        }
+        .btn {
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #e2eaf4;
+            color: #1f2e41;
+        }
+        .btn-primary {
+            background: #1a3a5e;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #112b45;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #b6cade;
+        }
+        .btn-outline:hover {
+            background: #eef3fa;
+        }
+        .btn-danger {
+            background: #d95b43;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #be4a34;
+        }
+
+        .footer-note {
+            font-size: 13px;
+            color: #758b9f;
+            text-align: center;
+            margin-top: 18px;
+            border-top: 1px solid #e4ecf5;
+            padding-top: 18px;
+        }
+        .writing-hint {
+            padding: 12px 16px;
+            background: #f0f7ff;
+            border-radius: 14px;
+            border: 1px solid #c5d9f0;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #1d3a57;
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+            .dialogue-block,
+            .other-block {
+                padding: 14px;
+            }
+            .blank-selector {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+    <h1>🇬🇧 本科英语（一）</h1>
+    <div class="sub">A 卷 + B 卷 · 对话填空（整体作答）· 阅读 · 词汇 · 完形 · 写作</div>
+
+    <div class="tabs">
+        <button class="active" data-paper="all">📚 全部（A+B）</button>
+        <button data-paper="A">📄 A 卷</button>
+        <button data-paper="B">📄 B 卷</button>
+    </div>
+
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="stats">
+        <span id="progressText">0 / 0 题</span>
+        <span class="right" id="correctCount">✅ 正确 0</span>
+        <span class="wrong" id="wrongCount">❌ 错误 0</span>
+    </div>
+
+    <div id="questionsContainer"></div>
+
+    <div class="actions">
+        <button class="btn btn-outline" id="resetBtn">🔄 重新答题</button>
+        <button class="btn btn-primary" id="scrollToTopBtn">↑ 回到顶部</button>
+    </div>
+    <div class="footer-note">✔ 对话填空：每个对话所有空选完后点击"检查答案"统一判对错</div>
+</div>
+
+<script>
+    // ================================================================
+    // 本科英语（一）· 对话填空题（修复版）
+    // 判题逻辑：比较选项文本是否以正确答案字母开头（A. / B. / C. / D.）
+    // ================================================================
+
+    // ---- 对话数据 ----
+    const dialogues = [
+        // A卷 对话1
+        {
+            id: 'A_dialogue1',
+            paper: 'A',
+            title: 'Dialogue 1 (A卷)',
+            text: `Tracey: Don't you have air-conditioning in your apartment? It's sweltering here!
+        Alice: Well, there's air-conditioning. Did you see the window air-conditioner there? ___1___
+        Tracey: I guess not, huh.
+        Alice: Well, I'm going to move out anyway. The new apartment has central air-conditioning.
+        Tracey: ___2___
+        Alice: Well, I had to wait until the lease expired. So...
+        Tracey: ___3___
+        Alice: Well, I open the windows and... and I've got an electric fan here. It helps a little.`,
+            blanks: [
+                { id: 1, options: ['A. This summer is expectedly hot.', 'B. So how can you stand the heat?', 'C. The problem is that the window unit is not powerful enough.', 'D. You should\'ve moved out long, long ago.'], answer: 'C' },
+                { id: 2, options: ['A. This summer is expectedly hot.', 'B. So how can you stand the heat?', 'C. The problem is that the window unit is not powerful enough.', 'D. You should\'ve moved out long, long ago.'], answer: 'D' },
+                { id: 3, options: ['A. This summer is expectedly hot.', 'B. So how can you stand the heat?', 'C. The problem is that the window unit is not powerful enough.', 'D. You should\'ve moved out long, long ago.'], answer: 'B' }
+            ]
+        },
+        // A卷 对话2
+        {
+            id: 'A_dialogue2',
+            paper: 'A',
+            title: 'Dialogue 2 (A卷)',
+            text: `Man: What is your major?
+        Woman: English.
+        M: What are you going to do with English major?
+        W: ___4___
+        M: High school or middle school?
+        W: High school.
+        M: ___5___
+        W: I didn't know that.
+        M: ___6___
+        W: How do you like it?
+        M: I like it very much. ___7___
+        W: Really?`,
+            blanks: [
+                { id: 4, options: ['A. I think it\'s the best job ever.', 'B. I started teaching five years ago.', 'C. I teach high school English.', 'D. I\'m going to be a teacher.'], answer: 'D' },
+                { id: 5, options: ['A. I think it\'s the best job ever.', 'B. I started teaching five years ago.', 'C. I teach high school English.', 'D. I\'m going to be a teacher.'], answer: 'C' },
+                { id: 6, options: ['A. I think it\'s the best job ever.', 'B. I started teaching five years ago.', 'C. I teach high school English.', 'D. I\'m going to be a teacher.'], answer: 'B' },
+                { id: 7, options: ['A. I think it\'s the best job ever.', 'B. I started teaching five years ago.', 'C. I teach high school English.', 'D. I\'m going to be a teacher.'], answer: 'A' }
+            ]
+        },
+        // A卷 对话3
+        {
+            id: 'A_dialogue3',
+            paper: 'A',
+            title: 'Dialogue 3 (A卷)',
+            text: `Victoria: Hello, is Margaret there?
+        Margaret: ___8___
+        Victoria: Hello, Margaret, this is the tenant of Apartment 10. I guessed my kitchen sink is blocked up again, and so is the bathtub.
+        Margaret: ___9___
+        Victoria: Um, I'd appreciate it if you would send someone to fix it today. ___10___ I can't cook or take a shower.
+        Margaret: Fine, I'll be up in a few minutes.
+        Victoria: Thanks. I appreciate it.`,
+            blanks: [
+                { id: 8, options: ['A. This is she.', 'B. Yes, I am.', 'C. It\'s really a bother!', 'D. Right, I\'ll send someone over tomorrow.'], answer: 'A' },
+                { id: 9, options: ['A. This is she.', 'B. Yes, I am.', 'C. It\'s really a bother!', 'D. Right, I\'ll send someone over tomorrow.'], answer: 'D' },
+                { id: 10, options: ['A. This is she.', 'B. Yes, I am.', 'C. It\'s really a bother!', 'D. Right, I\'ll send someone over tomorrow.'], answer: 'C' }
+            ]
+        },
+        // B卷 对话1
+        {
+            id: 'B_dialogue1',
+            paper: 'B',
+            title: 'Dialogue 1 (B卷)',
+            text: `Man: What is your major?
+        Woman: English.
+        M: What are you going to do with English major?
+        W: ___1___
+        M: High school or middle school?
+        W: High school.
+        M: ___2___
+        W: I didn't know that.
+        M: ___3___
+        W: How do you like it?
+        M: I like it very much. ___4___
+        W: Really?`,
+            blanks: [
+                { id: 1, options: ['A. I think it\'s the best job ever.', 'B. I started teaching five years ago.', 'C. I teach high school English.', 'D. I\'m going to be a teacher.'], answer: 'D' },
+                { id: 2, options: ['A. I think it\'s the best job ever.', 'B. I started teaching five years ago.', 'C. I teach high school English.', 'D. I\'m going to be a teacher.'], answer: 'C' },
+                { id: 3, options: ['A. I think it\'s the best job ever.', 'B. I started teaching five years ago.', 'C. I teach high school English.', 'D. I\'m going to be a teacher.'], answer: 'B' },
+                { id: 4, options: ['A. I think it\'s the best job ever.', 'B. I started teaching five years ago.', 'C. I teach high school English.', 'D. I\'m going to be a teacher.'], answer: 'A' }
+            ]
+        },
+        // B卷 对话2
+        {
+            id: 'B_dialogue2',
+            paper: 'B',
+            title: 'Dialogue 2 (B卷)',
+            text: `Tracey: Don't you have air-conditioning in your apartment? It's sweltering here!
+        Alice: Well, there's air-conditioning. Did you see the window air-conditioner there? ___5___
+        Tracey: I guess not, huh.
+        Alice: Well, I'm going to move out anyway. The new apartment has central air-conditioning.
+        Tracey: ___6___
+        Alice: Well, I had to wait until the lease expired. So...
+        Tracey: ___7___
+        Alice: Well, I open the windows and... and I've got an electric fan here. It helps a little.`,
+            blanks: [
+                { id: 5, options: ['A. This summer is expectedly hot.', 'B. So how can you stand the heat?', 'C. The problem is that the window unit is not powerful enough.', 'D. You should\'ve moved out long, long ago.'], answer: 'C' },
+                { id: 6, options: ['A. This summer is expectedly hot.', 'B. So how can you stand the heat?', 'C. The problem is that the window unit is not powerful enough.', 'D. You should\'ve moved out long, long ago.'], answer: 'D' },
+                { id: 7, options: ['A. This summer is expectedly hot.', 'B. So how can you stand the heat?', 'C. The problem is that the window unit is not powerful enough.', 'D. You should\'ve moved out long, long ago.'], answer: 'B' }
+            ]
+        },
+        // B卷 对话3
+        {
+            id: 'B_dialogue3',
+            paper: 'B',
+            title: 'Dialogue 3 (B卷)',
+            text: `Victoria: Hello, is Margaret there?
+        Margaret: ___8___
+        Victoria: Hello, Margaret, this is the tenant of Apartment 10. I guessed my kitchen sink is blocked up again, and so is the bathtub.
+        Margaret: ___9___
+        Victoria: Um, I'd appreciate it if you would send someone to fix it today. ___10___ I can't cook or take a shower.
+        Margaret: Fine, I'll be up in a few minutes.
+        Victoria: Thanks. I appreciate it.`,
+            blanks: [
+                { id: 8, options: ['A. This is she.', 'B. Yes, I am.', 'C. It\'s really a bother!', 'D. Right, I\'ll send someone over tomorrow.'], answer: 'A' },
+                { id: 9, options: ['A. This is she.', 'B. Yes, I am.', 'C. It\'s really a bother!', 'D. Right, I\'ll send someone over tomorrow.'], answer: 'D' },
+                { id: 10, options: ['A. This is she.', 'B. Yes, I am.', 'C. It\'s really a bother!', 'D. Right, I\'ll send someone over tomorrow.'], answer: 'C' }
+            ]
+        }
+    ];
+
+    // ---- 其他题型（阅读/词汇/完形/写作）----
+    const otherQuestions = [
+        // ===== A卷 阅读 =====
+        { id: 'A_r1_1', paper: 'A', type: '阅读理解', question: 'Passage 1 (Sun\'s Evolution) — What is the passage mainly about?', options: ['a. faint dwarfs stars', 'b. the evolution cycle of the Sun', 'c. the Sun\'s fuel problem', 'd. the dangers of invisible radiation'], answer: 'b' },
+        { id: 'A_r1_2', paper: 'A', type: '阅读理解', question: 'Passage 1 — What does the author say is especially important about the Sun at the present time?', options: ['a. It appears yellow', 'b. It always remains the same', 'c. It has a short history', 'd. It is too cold'], answer: 'a' },
+        { id: 'A_r1_3', paper: 'A', type: '阅读理解', question: 'Passage 1 — Some very hot stars are referred to as "ghosts", for they are ___.', options: ['a. short-lived', 'b. mysterious', 'c. frightening', 'd. nearly invisible'], answer: 'd' },
+        { id: 'A_r1_4', paper: 'A', type: '阅读理解', question: 'Passage 1 — According to the passage, as the Sun continues to age, what color is it likely to become?', options: ['a. yellow', 'b. violet', 'c. red', 'd. white'], answer: 'c' },
+        { id: 'A_r1_5', paper: 'A', type: '阅读理解', question: 'Passage 1 — In the last sentence, to which does "it" refer?', options: ['a. yellow "hump"', 'b. day', 'c. sun', 'd. hydrogen fuel'], answer: 'c' },
+        { id: 'A_r2_1', paper: 'A', type: '阅读理解', question: 'Passage 2 (Lincoln\'s Gettysburg) — In 1863, Abraham Lincoln was ___.', options: ['a. very critical', 'b. unpopular', 'c. very popular', 'd. very courteous'], answer: 'b' },
+        { id: 'A_r2_2', paper: 'A', type: '阅读理解', question: 'Passage 2 — Lincoln was invited to speak at the National Soldiers Cemetery because it was ___.', options: ['a. president of the country', 'b. a popular speaker', 'c. a famous speaker', 'd. a very handsome man'], answer: 'a' },
+        { id: 'A_r2_3', paper: 'A', type: '阅读理解', question: 'Passage 2 — We can conclude from the text that ___.', options: ['a. Lincoln\'s speech was full of rich words', 'b. he prepared his speech very carefully', 'c. Lincoln\'s speech was very long', 'd. he didn\'t have much time to prepare the speech'], answer: 'd' },
+        { id: 'A_r2_4', paper: 'A', type: '阅读理解', question: 'Passage 2 — It was a fact that Lincoln\'s speech was ___.', options: ['a. not successful', 'b. warmly applauded', 'c. a total failure', 'd. not well-received at first'], answer: 'd' },
+        { id: 'A_r2_5', paper: 'A', type: '阅读理解', question: 'Passage 2 — Which statement about Lincoln\'s speech is wrong?', options: ['a. It is memorized by every American school child', 'b. It is the greatest speech in the US', 'c. It has deep meaning', 'd. It is simple in style'], answer: 'b' },
+        { id: 'A_r3_1', paper: 'A', type: '阅读理解', question: 'Passage 3 (Cicada) — The cicada congregation call ___.', options: ['a. attracts only males', 'b. is given by both sexes', 'c. is only given by males', 'd. attracts only females'], answer: 'c' },
+        { id: 'A_r3_2', paper: 'A', type: '阅读理解', question: 'Passage 3 — During typical courtship, when a male first notices a female near him, he gives ___.', options: ['a. the two courtship calls together', 'b. a series of slow ticks', 'c. 12 to 40 rapid ticks', 'd. a two-second buzz'], answer: 'b' },
+        { id: 'A_r3_3', paper: 'A', type: '阅读理解', question: 'Passage 3 — How does the congregation call differ from the two courtship calls together?', options: ['a. it is delivered at a slower rate', 'b. it is delivered at a fast rate', 'c. the ticks precede the ticks', 'd. the buzzes precede the ticks'], answer: 'b' },
+        { id: 'A_r3_4', paper: 'A', type: '阅读理解', question: 'Passage 3 — Why is communication so important for cicadas?', options: ['a. It helps them defend themselves', 'b. It warns of approaching danger', 'c. It separates males from females', 'd. It is necessary for species continuation'], answer: 'd' },
+        { id: 'A_r3_5', paper: 'A', type: '阅读理解', question: 'Passage 3 — What does "comprises" mean?', options: ['a. includes', 'b. sends out', 'c. absorbs', 'd. slows down'], answer: 'a' },
+        { id: 'A_r4_1', paper: 'A', type: '阅读理解', question: 'Passage 4 (Dutch meetings) — According to Paragraph 1, meetings in Dutch companies seem to ___.', options: ['a. be held usually for important issue', 'b. waste a lot of time in fruitless discussions', 'c. enable employees to know each other better', 'd. be good occasions for showing talents'], answer: 'b' },
+        { id: 'A_r4_2', paper: 'A', type: '阅读理解', question: 'Passage 4 — To Dutch employees, one who is absent from a meeting ___.', options: ['a. does not take his colleagues seriously', 'b. may have something more urgent to do', 'c. does not miss much critical information', 'd. may have nothing to say'], answer: 'a' },
+        { id: 'A_r4_3', paper: 'A', type: '阅读理解', question: 'Passage 4 — According to Paragraph 3, why can\'t Dutch employees come to a quick decision?', options: ['a. People are in constant dispute', 'b. An idea usually undergoes a full discussion', 'c. Suggestions often lead nowhere', 'd. People often forget the aims'], answer: 'b' },
+        { id: 'A_r4_4', paper: 'A', type: '阅读理解', question: 'Passage 4 — What does the last paragraph tell us?', options: ['a. Many leaders in the world are Dutch', 'b. Dutch employees are highly productive', 'c. Dutch companies are the most successful', 'd. Dutch employees are the hardest'], answer: 'b' },
+        { id: 'A_r4_5', paper: 'A', type: '阅读理解', question: 'Passage 4 — The author\'s attitude towards Dutch meeting is quite ___.', options: ['a. unclear', 'b. negative', 'c. positive', 'd. neutral'], answer: 'c' },
+        // ===== A卷 词汇 =====
+        { id: 'A_v1', paper: 'A', type: '词汇语法', question: 'I\'ll keep your company if you ___ there.', options: ['a. will go', 'b. went', 'c. shall go', 'd. go'], answer: 'd' },
+        { id: 'A_v2', paper: 'A', type: '词汇语法', question: '___ down the television — our baby is sleeping in the next room.', options: ['a. Turn', 'b. Turning', 'c. Turned', 'd. To turn'], answer: 'a' },
+        { id: 'A_v3', paper: 'A', type: '词汇语法', question: 'The policeman told John that his bike ___ and he could take it home right away.', options: ['a. would be found', 'b. was found', 'c. had been found', 'd. were found'], answer: 'c' },
+        { id: 'A_v4', paper: 'A', type: '词汇语法', question: 'He will be watching her anxiously ___ she swims the long distance.', options: ['a. while', 'b. where', 'c. during', 'd. meanwhile'], answer: 'a' },
+        { id: 'A_v5', paper: 'A', type: '词汇语法', question: 'He had no sooner returned to the countryside ___ he bought a house and went to live there.', options: ['a. when', 'b. as soon as', 'c. shortly after', 'd. than'], answer: 'd' },
+        { id: 'A_v6', paper: 'A', type: '词汇语法', question: 'She is ___ a kind person that they all speak highly of her.', options: ['a. so', 'b. as', 'c. such', 'd. like'], answer: 'c' },
+        { id: 'A_v7', paper: 'A', type: '词汇语法', question: 'Sally is not at home. She ___ back in two hours.', options: ['a. be', 'b. is', 'c. has', 'd. will be'], answer: 'd' },
+        { id: 'A_v8', paper: 'A', type: '词汇语法', question: 'The room is so clean. He must ___ the cleaning before he left.', options: ['a. do', 'b. have done', 'c. did', 'd. be done'], answer: 'b' },
+        { id: 'A_v9', paper: 'A', type: '词汇语法', question: 'Mrs. White moved to this city in 2003. She ___ here for ten years.', options: ['a. will live', 'b. is living', 'c. has been living', 'd. lives'], answer: 'c' },
+        { id: 'A_v10', paper: 'A', type: '词汇语法', question: 'Most have been driven away from their homes by the noise. I\'m one of ___ people left.', options: ['a. a few', 'b. the few', 'c. a little', 'd. the little'], answer: 'b' },
+        { id: 'A_v11', paper: 'A', type: '词汇语法', question: 'She is ___ driver as any one else.', options: ['a. as good a', 'b. as a good', 'c. so good a', 'd. so a good'], answer: 'a' },
+        { id: 'A_v12', paper: 'A', type: '词汇语法', question: 'Few people know his reason for quitting his job was ___ he wanted to go abroad.', options: ['a. whether', 'b. where', 'c. why', 'd. that'], answer: 'd' },
+        { id: 'A_v13', paper: 'A', type: '词汇语法', question: 'I arrived late; I ___ the traffic to be so heavy this morning.', options: ['a. wasn\'t expecting', 'b. wouldn\'t expecting', 'c. haven\'t expecting', 'd. hadn\'t expected'], answer: 'd' },
+        { id: 'A_v14', paper: 'A', type: '词汇语法', question: 'No sooner had we reached the top of the hill ___ we all sat down to rest.', options: ['a. when', 'b. then', 'c. than', 'd. until'], answer: 'c' },
+        { id: 'A_v15', paper: 'A', type: '词汇语法', question: '___ its good performance, the machine is too expensive.', options: ['a. Besides', 'b. Except', 'c. In spite of', 'd. Apart from'], answer: 'c' },
+        { id: 'A_v16', paper: 'A', type: '词汇语法', question: '___ for their support, he would have gone penniless.', options: ['a. If it is not', 'b. If it is', 'c. Were it', 'd. Were it not'], answer: 'd' },
+        { id: 'A_v17', paper: 'A', type: '词汇语法', question: 'There ___ in his room.', options: ['a. are too many furnitures', 'b. is too much furniture', 'c. are too much furniture', 'd. is too many furnitures'], answer: 'b' },
+        { id: 'A_v18', paper: 'A', type: '词汇语法', question: 'I miss the hillside ___ we found a lot of wild flowers.', options: ['a. on which', 'b. by which', 'c. in which', 'd. for which'], answer: 'a' },
+        { id: 'A_v19', paper: 'A', type: '词汇语法', question: 'When the man with glasses came into the hotel, I noticed a ___ look come over the manager\'s face.', options: ['a. surprised', 'b. surprising', 'c. surprise', 'd. surprisingly'], answer: 'a' },
+        { id: 'A_v20', paper: 'A', type: '词汇语法', question: 'He looks sleepy. He must ___ to bed very late last night.', options: ['a. be gone', 'b. be going', 'c. go', 'd. have gone'], answer: 'd' },
+        // ===== A卷 完形 =====
+        { id: 'A_c1', paper: 'A', type: '完形填空', question: 'Tourism has become a big business. For Spain, Italy and Greece it is the largest (51) ___ of foreign exchange...', options: ['a. factor', 'b. resource', 'c. source', 'd. cause'], answer: 'c' },
+        { id: 'A_c2', paper: 'A', type: '完形填空', question: '... no government can afford to look (52) ___ on the business...', options: ['a. up', 'b. at', 'c. for', 'd. down'], answer: 'd' },
+        { id: 'A_c3', paper: 'A', type: '完形填空', question: '... questions of hotel bath rooms, beach umbrellas and ice-cream sales are now (53) ___ by ministers...', options: ['a. determined', 'b. discussed', 'c. argued', 'd. sold'], answer: 'b' },
+        { id: 'A_c4', paper: 'A', type: '完形填空', question: 'Before the WWII the tourism industry was widely (54) ___ as being unmanly and stupid.', options: ['a. regarded', 'b. said', 'c. talked', 'd. spread'], answer: 'a' },
+        { id: 'A_c5', paper: 'A', type: '完形填空', question: 'But (55) ___ has become a new business, as trade business used to do...', options: ['a. agriculture', 'b. war', 'c. tourism', 'd. education'], answer: 'c' },
+        { id: 'A_c6', paper: 'A', type: '完形填空', question: 'Much of tourism is a nationalized industry, a (56) ___ part of national planning.', options: ['a. key', 'b. minor', 'c. linking', 'd. questioning'], answer: 'a' },
+        { id: 'A_c7', paper: 'A', type: '完形填空', question: '... the French government is killing mosquitoes and (57) ___ six big vacation places...', options: ['a. built', 'b. building', 'c. to be built', 'd. have built'], answer: 'b' },
+        { id: 'A_c8', paper: 'A', type: '完形填空', question: '... a whole new seaside culture has sprung up (58) ___ the last few years...', options: ['a. over', 'b. for', 'c. after', 'd. beyond'], answer: 'a' },
+        { id: 'A_c9', paper: 'A', type: '完形填空', question: '... the government have greatly (59) ___ when tourists from the West multiplied...', options: ['a. suffered', 'b. lost', 'c. invested', 'd. benefited'], answer: 'd' },
+        { id: 'A_c10', paper: 'A', type: '完形填空', question: '... from half a million four years (60) ___ to nearly two million last year.', options: ['a. since', 'b. before', 'c. ago', 'd. after'], answer: 'c' },
+        // ===== A卷 写作 =====
+        { id: 'A_w1', paper: 'A', type: '写作', question: 'Writing Topic: Family Education<br>Write an essay in about 120 words.<br>Outline: 1. Parents are paying more attention to family education. 2. Family education has both advantages and disadvantages. 3. Your opinions.', answer: '【参考思路】开头：家庭教育的重视程度提高。主体：优点（培养品格、亲密度）vs 缺点（过度保护、压力大）。结尾：父母应适度引导，尊重孩子独立性。' },
+        // ===== B卷 阅读 =====
+        { id: 'B_r1_1', paper: 'B', type: '阅读理解', question: 'Passage 1 (Lincoln) — In 1863, Abraham Lincoln was ___.', options: ['a. very critical', 'b. unpopular', 'c. very popular', 'd. very courteous'], answer: 'b' },
+        { id: 'B_r1_2', paper: 'B', type: '阅读理解', question: 'Passage 1 — Lincoln was invited to speak at the National Soldiers Cemetery because it was ___.', options: ['a. president of the country', 'b. a popular speaker', 'c. a famous speaker', 'd. a very handsome man'], answer: 'a' },
+        { id: 'B_r1_3', paper: 'B', type: '阅读理解', question: 'Passage 1 — We can conclude from the text that ___.', options: ['a. Lincoln\'s speech was full of rich words', 'b. he prepared his speech very carefully', 'c. Lincoln\'s speech was very long', 'd. he didn\'t have much time to prepare'], answer: 'd' },
+        { id: 'B_r1_4', paper: 'B', type: '阅读理解', question: 'Passage 1 — It was a fact that Lincoln\'s speech was ___.', options: ['a. not successful', 'b. warmly applauded', 'c. a total failure', 'd. not well-received at first'], answer: 'd' },
+        { id: 'B_r1_5', paper: 'B', type: '阅读理解', question: 'Passage 1 — Which statement about Lincoln\'s speech is wrong?', options: ['a. It is memorized by every American school child', 'b. It is the greatest speech in the US', 'c. It has deep meaning', 'd. It is simple in style'], answer: 'b' },
+        { id: 'B_r2_1', paper: 'B', type: '阅读理解', question: 'Passage 2 (Boomerang Kids) — There was once a trend in the US that ___.', options: ['a. middle class young adults stayed with parents', 'b. divorced young adults moved back home', 'c. young adults left their parents and live independently', 'd. with marriage rising, young adults spent more time with parents'], answer: 'c' },
+        { id: 'B_r2_2', paper: 'B', type: '阅读理解', question: 'Passage 2 — Which is NOT a reason for young adults returning home?', options: ['a. Housing cost is a serious problem', 'b. Difficult to afford away-from-home college', 'c. They want emotional comfort after divorce', 'd. They are too naïve to live independently'], answer: 'd' },
+        { id: 'B_r2_3', paper: 'B', type: '阅读理解', question: 'Passage 2 — Disadvantages of staying with parents EXCEPT ___.', options: ['a. difficulty to support a large family', 'b. inconvenience in daily life', 'c. parent\'s interference in privacy', 'd. excessive restrictions of behavior'], answer: 'a' },
+        { id: 'B_r2_4', paper: 'B', type: '阅读理解', question: 'Passage 2 — What is the best way for children and parents?', options: ['a. Parents should let children alone', 'b. Children should share family expense', 'c. Children should visit parents from time to time', 'd. Children should live independently at 18'], answer: 'c' },
+        { id: 'B_r2_5', paper: 'B', type: '阅读理解', question: 'Passage 2 — The word "skyrocketing" means ___.', options: ['a. soaring', 'b. of rocket', 'c. fast', 'd. speeding'], answer: 'a' },
+        { id: 'B_r3_1', paper: 'B', type: '阅读理解', question: 'Passage 3 (Market) — All of the following can be called commodities in the usual sense EXCEPT ___.', options: ['a. fruit and vegetables', 'b. meat', 'c. books', 'd. labor'], answer: 'd' },
+        { id: 'B_r3_2', paper: 'B', type: '阅读理解', question: 'Passage 3 — We can see from the passage that ___.', options: ['a. market-place is not always indispensable', 'b. buyers and sellers can deal through a third party', 'c. market does not always mean a place', 'd. all of the above'], answer: 'd' },
+        { id: 'B_r3_3', paper: 'B', type: '阅读理解', question: 'Passage 3 — Anything can have a potential world market on the ground that ___.', options: ['a. buyers and sellers are scattered worldwide', 'b. price in one part affects other parts', 'c. modern means of communication are available', 'd. both A and B'], answer: 'c' },
+        { id: 'B_r3_4', paper: 'B', type: '阅读理解', question: 'Passage 3 — In fact, many things don\'t have a world market because ___.', options: ['a. they are too expensive', 'b. they are not world-wide demanded', 'c. it is difficult or costly to transport them', 'd. both A and B'], answer: 'c' },
+        { id: 'B_r3_5', paper: 'B', type: '阅读理解', question: 'Passage 3 — The author\'s writing purpose is to ___.', options: ['a. prove functions of modern transportation', 'b. get readers acquainted with clear definitions of a market', 'c. argue against the common concept of a market', 'd. help readers know market-places of various kinds'], answer: 'b' },
+        { id: 'B_r4_1', paper: 'B', type: '阅读理解', question: 'Passage 4 (Dutch meetings) — According to Paragraph 1, meetings in Dutch companies seem to ___.', options: ['a. be held for important issue', 'b. waste a lot of time in fruitless discussions', 'c. enable employees to know each other', 'd. be good occasions for showing talents'], answer: 'b' },
+        { id: 'B_r4_2', paper: 'B', type: '阅读理解', question: 'Passage 4 — To Dutch employees, one who is absent from a meeting ___.', options: ['a. does not take colleagues seriously', 'b. may have something more urgent', 'c. does not miss much information', 'd. may have nothing to say'], answer: 'a' },
+        { id: 'B_r4_3', paper: 'B', type: '阅读理解', question: 'Passage 4 — Why can\'t Dutch employees come to a quick decision?', options: ['a. People are in constant dispute', 'b. An idea usually undergoes full discussion', 'c. Suggestions often lead nowhere', 'd. People often forget the aims'], answer: 'b' },
+        { id: 'B_r4_4', paper: 'B', type: '阅读理解', question: 'Passage 4 — What does the last paragraph tell us?', options: ['a. Many leaders in the world are Dutch', 'b. Dutch employees are highly productive', 'c. Dutch companies are the most successful', 'd. Dutch employees are the hardest'], answer: 'b' },
+        { id: 'B_r4_5', paper: 'B', type: '阅读理解', question: 'Passage 4 — The author\'s attitude towards Dutch meeting is quite ___.', options: ['a. unclear', 'b. negative', 'c. positive', 'd. neutral'], answer: 'c' },
+        // ===== B卷 词汇 =====
+        { id: 'B_v1', paper: 'B', type: '词汇语法', question: 'She is ___ driver as any one else.', options: ['a. as good a', 'b. as a good', 'c. so good a', 'd. so a good'], answer: 'a' },
+        { id: 'B_v2', paper: 'B', type: '词汇语法', question: 'Few people know his reason for quitting his job was ___ he wanted to go abroad.', options: ['a. whether', 'b. where', 'c. why', 'd. that'], answer: 'd' },
+        { id: 'B_v3', paper: 'B', type: '词汇语法', question: 'I arrived late; I ___ the traffic to be so heavy this morning.', options: ['a. wasn\'t expecting', 'b. wouldn\'t expecting', 'c. haven\'t expecting', 'd. hadn\'t expected'], answer: 'd' },
+        { id: 'B_v4', paper: 'B', type: '词汇语法', question: 'No sooner had we reached the top of the hill ___ we all sat down to rest.', options: ['a. when', 'b. then', 'c. than', 'd. until'], answer: 'c' },
+        { id: 'B_v5', paper: 'B', type: '词汇语法', question: '___ its good performance, the machine is too expensive.', options: ['a. Besides', 'b. Except', 'c. In spite of', 'd. Apart from'], answer: 'c' },
+        { id: 'B_v6', paper: 'B', type: '词汇语法', question: 'It is Thomas Edison that ___ the electric lamp.', options: ['a. invented', 'b. discovered', 'c. designed', 'd. developed'], answer: 'a' },
+        { id: 'B_v7', paper: 'B', type: '词汇语法', question: '___, the group of pop singers are visiting all parts of the country.', options: ['a. At present', 'b. On time', 'c. In the future', 'd. In the past'], answer: 'a' },
+        { id: 'B_v8', paper: 'B', type: '词汇语法', question: 'I felt very nervous as I went into his office, and he did not ___ from his desk when I entered.', options: ['a. look out', 'b. look down', 'c. look round', 'd. look up'], answer: 'd' },
+        { id: 'B_v9', paper: 'B', type: '词汇语法', question: 'As I felt so much better, my doctor ___ me to take a holiday by the sea.', options: ['a. suggested', 'b. advised', 'c. recommended', 'd. considered'], answer: 'b' },
+        { id: 'B_v10', paper: 'B', type: '词汇语法', question: 'I love thinking of new designs. It keeps my mind clear and fills my retired life with ___.', options: ['a. sorrow', 'b. anxiety', 'c. joy', 'd. anger'], answer: 'c' },
+        { id: 'B_v11', paper: 'B', type: '词汇语法', question: '___ for their support, he would have gone penniless.', options: ['a. If it is not', 'b. If it is', 'c. Were it', 'd. Were it not'], answer: 'd' },
+        { id: 'B_v12', paper: 'B', type: '词汇语法', question: 'There ___ in his room.', options: ['a. are too many furnitures', 'b. is too much furniture', 'c. are too much furniture', 'd. is too many furnitures'], answer: 'b' },
+        { id: 'B_v13', paper: 'B', type: '词汇语法', question: 'I miss the hillside ___ we found a lot of wild flowers.', options: ['a. on which', 'b. by which', 'c. in which', 'd. for which'], answer: 'a' },
+        { id: 'B_v14', paper: 'B', type: '词汇语法', question: 'When the man with glasses came in, I noticed a ___ look come over the manager\'s face.', options: ['a. surprised', 'b. surprising', 'c. surprise', 'd. surprisingly'], answer: 'a' },
+        { id: 'B_v15', paper: 'B', type: '词汇语法', question: 'He looks sleepy. He must ___ to bed very late last night.', options: ['a. be gone', 'b. be going', 'c. go', 'd. have gone'], answer: 'd' },
+        { id: 'B_v16', paper: 'B', type: '词汇语法', question: 'The car was badly smashed up, but the driver got away without serious ___.', options: ['a. damage', 'b. wound', 'c. pain', 'd. injury'], answer: 'd' },
+        { id: 'B_v17', paper: 'B', type: '词汇语法', question: 'A ___ policeman answered his question politely and patiently.', options: ['a. smiled', 'b. smiling', 'c. smile', 'd. smiles'], answer: 'b' },
+        { id: 'B_v18', paper: 'B', type: '词汇语法', question: 'It was noisy near the airport. ___, he moved away because it was more than he could bear.', options: ['a. At the beginning', 'b. from then on', 'c. In the end', 'd. By the way'], answer: 'c' },
+        { id: 'B_v19', paper: 'B', type: '词汇语法', question: 'He acted ___ he had never been here before.', options: ['a. as if', 'b. even if', 'c. while', 'd. although'], answer: 'a' },
+        { id: 'B_v20', paper: 'B', type: '词汇语法', question: '-- Will you come on Saturday or Sunday? -- I\'m afraid ___ is possible. I will be busy the whole weekend.', options: ['a. either', 'b. neither', 'c. both', 'd. each'], answer: 'b' },
+        // ===== B卷 完形 =====
+        { id: 'B_c1', paper: 'B', type: '完形填空', question: 'Some people are lucky enough to be born with a good sense of direction... I am one of those (51) ___ people who have a very poor sense...', options: ['a. comfortable', 'b. fine', 'c. unfortunate', 'd. lucky'], answer: 'c' },
+        { id: 'B_c2', paper: 'B', type: '完形填空', question: '... I may have visited a place time after time but I still tend to get (52) ___ on my way here.', options: ['a. lost', 'b. disappeared', 'c. stuck', 'd. started'], answer: 'a' },
+        { id: 'B_c3', paper: 'B', type: '完形填空', question: 'When I was young I was (53) ___ shy that I never dared ask complete strangers...', options: ['a. so', 'b. a bit', 'c. such', 'd. very'], answer: 'a' },
+        { id: 'B_c4', paper: 'B', type: '完形填空', question: '... never dared ask complete strangers (54) ___ and so used to wander around in circles...', options: ['a. a way', 'b. the way', 'c. way', 'd. a direction'], answer: 'b' },
+        { id: 'B_c5', paper: 'B', type: '完形填空', question: '... hope that by some chance I would get to the spot I was heading (55) ___.', options: ['a. in', 'b. on', 'c. at', 'd. for'], answer: 'd' },
+        { id: 'B_c6', paper: 'B', type: '完形填空', question: 'I am (56) ___ too shy to ask people for directions, but I often received replies that puzzle me.', options: ['a. no longer', 'b. no more', 'c. not in the least', 'd. neither'], answer: 'a' },
+        { id: 'B_c7', paper: 'B', type: '完形填空', question: '... will insist on (57) ___ you the way even they do not know it...', options: ['a. being told', 'b. to tell', 'c. telling', 'd. tell'], answer: 'c' },
+        { id: 'B_c8', paper: 'B', type: '完形填空', question: '... others (58) ___ are anxious to prove that they know their hometown very well...', options: ['a. whom', 'b. which', 'c. that', 'd. who'], answer: 'c' },
+        { id: 'B_c9', paper: 'B', type: '完形填空', question: '... will give you a long list of (59) ___ which you cannot possibly hope to remember...', options: ['a. hopes', 'b. books', 'c. names', 'd. directions'], answer: 'd' },
+        { id: 'B_c10', paper: 'B', type: '完形填空', question: '... you find it the end that you are going in the (60) ___ direction.', options: ['a. opposed', 'b. same', 'c. other', 'd. opposite'], answer: 'd' },
+        // ===== B卷 写作 =====
+        { id: 'B_w1', paper: 'B', type: '写作', question: 'Writing Topic: Choosing Careers<br>Write an essay in about 120 words.<br>Outline: 1. Some people think parents should arrange careers for their children. 2. Children think they should make their own decision. 3. Your opinion.', answer: '【参考思路】开头：职业选择存在代际分歧。主体：父母安排（稳定、经验）vs 自主选择（兴趣、时代性）。结尾：建议结合双方意见，父母提供建议，孩子最终自主决定。' }
+    ];
+
+    // ================================================================
+    // 渲染引擎
+    // ================================================================
+    const container = document.getElementById('questionsContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const correctCountEl = document.getElementById('correctCount');
+    const wrongCountEl = document.getElementById('wrongCount');
+
+    let currentFilter = 'all';
+    let dialogueSelections = {};
+    let otherSelections = {};
+
+    // ----- 工具：判断选项是否匹配正确答案 -----
+    function isOptionCorrect(optionText, answerKey) {
+        // 如果选项文本以 "A." "B." "C." "D." 开头，取第一个字符比较
+        const match = optionText.match(/^([A-D])[.、]\s*/);
+        if (match) {
+            return match[1] === answerKey;
+        }
+        // 否则直接比较
+        return optionText === answerKey;
+    }
+
+    // ----- 获取正确答案的完整文本 -----
+    function getFullAnswerText(options, answerKey) {
+        for (let opt of options) {
+            const match = opt.match(/^([A-D])[.、]\s*/);
+            if (match && match[1] === answerKey) {
+                return opt;
+            }
+            if (opt === answerKey) return opt;
+        }
+        return answerKey; // fallback
+    }
+
+    function getFilteredDialogues() {
+        if (currentFilter === 'all') return dialogues;
+        return dialogues.filter(d => d.paper === currentFilter);
+    }
+
+    function getFilteredOthers() {
+        if (currentFilter === 'all') return otherQuestions;
+        return otherQuestions.filter(q => q.paper === currentFilter);
+    }
+
+    function renderAll() {
+        container.innerHTML = '';
+        const dList = getFilteredDialogues();
+        const oList = getFilteredOthers();
+
+        // ---- 对话 ----
+        dList.forEach((dialogue) => {
+            const block = document.createElement('div');
+            block.className = 'dialogue-block unanswered';
+            block.id = `dialogue-${dialogue.id}`;
+
+            const title = document.createElement('div');
+            title.className = 'dialogue-title';
+            title.textContent = `${dialogue.title}`;
+            block.appendChild(title);
+
+            const textDiv = document.createElement('div');
+            textDiv.className = 'dialogue-text';
+            let html = dialogue.text;
+            dialogue.blanks.forEach(b => {
+                const placeholder = `___${b.id}___`;
+                const sel = dialogueSelections[dialogue.id]?.[b.id];
+                let cls = 'blank';
+                if (sel) {
+                    const isCorrect = isOptionCorrect(sel, b.answer);
+                    cls += isCorrect ? ' filled' : ' filled-wrong';
+                }
+                const displayText = sel || `___${b.id}___`;
+                html = html.replace(placeholder, `<span class="${cls}" id="blank-${dialogue.id}-${b.id}">${displayText}</span>`);
+            });
+            textDiv.innerHTML = html.replace(/\n/g, '<br>');
+            block.appendChild(textDiv);
+
+            const selectorDiv = document.createElement('div');
+            selectorDiv.className = 'blank-selector';
+            dialogue.blanks.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'blank-item';
+                const label = document.createElement('label');
+                label.textContent = `___${b.id}___`;
+                const select = document.createElement('select');
+                select.id = `sel-${dialogue.id}-${b.id}`;
+                const defaultOpt = document.createElement('option');
+                defaultOpt.value = '';
+                defaultOpt.textContent = '-- 请选择 --';
+                select.appendChild(defaultOpt);
+                b.options.forEach(opt => {
+                    const op = document.createElement('option');
+                    op.value = opt;
+                    op.textContent = opt;
+                    select.appendChild(op);
+                });
+                if (dialogueSelections[dialogue.id]?.[b.id]) {
+                    select.value = dialogueSelections[dialogue.id][b.id];
+                }
+                select.addEventListener('change', function() {
+                    if (!dialogueSelections[dialogue.id]) dialogueSelections[dialogue.id] = {};
+                    dialogueSelections[dialogue.id][b.id] = this.value;
+                    updateDialogueDisplay(dialogue.id);
+                    const fb = document.getElementById(`fb-${dialogue.id}`);
+                    if (fb) {
+                        fb.className = 'feedback-dialogue';
+                        fb.innerHTML = '';
+                    }
+                    block.classList.remove('correct', 'wrong');
+                    block.classList.add('unanswered');
+                    updateProgress();
+                });
+                item.appendChild(label);
+                item.appendChild(select);
+                selectorDiv.appendChild(item);
+            });
+            block.appendChild(selectorDiv);
+
+            const checkBtn = document.createElement('button');
+            checkBtn.className = 'btn-check';
+            checkBtn.textContent = '✅ 检查本对话答案';
+            checkBtn.addEventListener('click', function() {
+                checkDialogue(dialogue.id);
+            });
+            block.appendChild(checkBtn);
+
+            const fb = document.createElement('div');
+            fb.className = 'feedback-dialogue';
+            fb.id = `fb-${dialogue.id}`;
+            block.appendChild(fb);
+
+            container.appendChild(block);
+        });
+
+        // ---- 其他题型 ----
+        oList.forEach((q, idx) => {
+            const block = document.createElement('div');
+            block.className = 'other-block unanswered';
+            block.id = `q-${q.id}`;
+
+            const title = document.createElement('div');
+            title.className = 'q-title';
+            const typeSpan = document.createElement('span');
+            typeSpan.className = 'q-type';
+            typeSpan.textContent = q.type;
+            title.appendChild(typeSpan);
+            title.innerHTML += ` ${idx+1}. ${q.question}`;
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options';
+
+            if (q.type === '写作') {
+                const note = document.createElement('div');
+                note.className = 'writing-hint';
+                note.innerHTML = q.answer;
+                optionsDiv.appendChild(note);
+                block.classList.remove('unanswered');
+                block.classList.add('correct');
+            } else if (q.options && q.options.length > 0) {
+                q.options.forEach(opt => {
+                    const label = document.createElement('label');
+                    label.className = 'option-label';
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = q.id;
+                    radio.value = opt;
+                    if (otherSelections[q.id] === opt) {
+                        radio.checked = true;
+                        label.classList.add('selected');
+                    }
+                    radio.addEventListener('change', function() {
+                        if (this.checked) {
+                            handleOtherSelect(q.id, opt);
+                        }
+                    });
+                    label.appendChild(radio);
+                    label.append(opt);
+                    optionsDiv.appendChild(label);
+                });
+            }
+
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback';
+            feedback.id = `fb-${q.id}`;
+            if (otherSelections[q.id] && q.type !== '写作') {
+                const isCorrect = isOptionCorrect(otherSelections[q.id], q.answer);
+                showOtherFeedback(q.id, isCorrect);
+            }
+
+            block.appendChild(title);
+            block.appendChild(optionsDiv);
+            block.appendChild(feedback);
+            container.appendChild(block);
+        });
+
+        updateProgress();
+    }
+
+    function updateDialogueDisplay(dialogueId) {
+        const dialogue = dialogues.find(d => d.id === dialogueId);
+        if (!dialogue) return;
+        const sel = dialogueSelections[dialogueId] || {};
+        dialogue.blanks.forEach(b => {
+            const span = document.getElementById(`blank-${dialogueId}-${b.id}`);
+            if (span) {
+                const val = sel[b.id];
+                let cls = 'blank';
+                if (val) {
+                    const isCorrect = isOptionCorrect(val, b.answer);
+                    cls += isCorrect ? ' filled' : ' filled-wrong';
+                }
+                span.className = cls;
+                span.textContent = val || `___${b.id}___`;
+            }
+            const select = document.getElementById(`sel-${dialogueId}-${b.id}`);
+            if (select) {
+                select.className = '';
+                const val = sel[b.id];
+                if (val) {
+                    const isCorrect = isOptionCorrect(val, b.answer);
+                    select.classList.add(isCorrect ? 'correct' : 'wrong');
+                }
+            }
+        });
+    }
+
+    function checkDialogue(dialogueId) {
+        const dialogue = dialogues.find(d => d.id === dialogueId);
+        if (!dialogue) return;
+        const sel = dialogueSelections[dialogueId] || {};
+        let allFilled = true;
+        let correctCount = 0;
+        let total = dialogue.blanks.length;
+
+        dialogue.blanks.forEach(b => {
+            if (!sel[b.id]) allFilled = false;
+            else if (isOptionCorrect(sel[b.id], b.answer)) correctCount++;
+        });
+
+        const fb = document.getElementById(`fb-${dialogueId}`);
+        const block = document.getElementById(`dialogue-${dialogueId}`);
+
+        if (!allFilled) {
+            fb.className = 'feedback-dialogue show wrong';
+            fb.innerHTML = '⚠️ 请先完成所有空的选择再检查答案。';
+            block.classList.remove('correct', 'wrong', 'unanswered');
+            block.classList.add('unanswered');
+            return;
+        }
+
+        const allCorrect = correctCount === total;
+        fb.className = `feedback-dialogue show ${allCorrect ? 'correct' : 'wrong'}`;
+        block.classList.remove('unanswered', 'correct', 'wrong');
+        block.classList.add(allCorrect ? 'correct' : 'wrong');
+
+        let detailHtml = '';
+        dialogue.blanks.forEach(b => {
+            const isCorrect = isOptionCorrect(sel[b.id], b.answer);
+            const status = isCorrect ? '✅' : '❌';
+            const fullAnswer = getFullAnswerText(b.options, b.answer);
+            detailHtml += `<div class="${isCorrect ? 'ok' : 'fail'}">${status} ___${b.id}___ → 你的选择：${sel[b.id]} ${isCorrect ? '' : '（正确答案：' + fullAnswer + '）'}</div>`;
+        });
+        fb.innerHTML = `
+            <div>${allCorrect ? '🎉 全部正确！' : `❌ 有 ${total - correctCount} 个空填错了。`}</div>
+            <div class="detail">${detailHtml}</div>
+        `;
+
+        updateDialogueDisplay(dialogueId);
+        updateProgress();
+    }
+
+    function handleOtherSelect(qId, selected) {
+        otherSelections[qId] = selected;
+        const isCorrect = isOptionCorrect(selected, otherQuestions.find(q => q.id === qId)?.answer || '');
+        showOtherFeedback(qId, isCorrect);
+
+        const block = document.getElementById(`q-${qId}`);
+        block.classList.remove('unanswered', 'correct', 'wrong');
+        block.classList.add(isCorrect ? 'correct' : 'wrong');
+
+        const labels = block.querySelectorAll('.option-label');
+        const q = otherQuestions.find(q => q.id === qId);
+        labels.forEach(label => {
+            const radio = label.querySelector('input[type="radio"]');
+            const val = radio.value;
+            label.classList.remove('selected', 'correct-answer', 'wrong-answer');
+            if (val === selected) {
+                label.classList.add('selected');
+                if (isCorrect) label.classList.add('correct-answer');
+                else label.classList.add('wrong-answer');
+            }
+            if (q && q.options && q.answer) {
+                const fullCorrect = getFullAnswerText(q.options, q.answer);
+                if (fullCorrect && val === fullCorrect) {
+                    label.classList.add('correct-answer');
+                }
+                // 如果选项以字母开头，匹配前缀
+                const match = val.match(/^([A-Da-d])[.、]\s*/);
+                if (match && match[1].toUpperCase() === q.answer) {
+                    label.classList.add('correct-answer');
+                }
+            }
+        });
+        updateProgress();
+    }
+
+    function showOtherFeedback(qId, isCorrect) {
+        const q = otherQuestions.find(q => q.id === qId);
+        const fb = document.getElementById(`fb-${qId}`);
+        if (!fb || q.type === '写作') return;
+        fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+        let correctDisplay = '';
+        if (!isCorrect && q) {
+            const fullAnswer = getFullAnswerText(q.options, q.answer);
+            correctDisplay = `<span class="correct-ans">正确答案：${fullAnswer}</span>`;
+        }
+        fb.innerHTML = isCorrect ? '✅ 回答正确！' : `❌ 回答错误。${correctDisplay}`;
+    }
+
+    function updateProgress() {
+        const dList = getFilteredDialogues();
+        const oList = getFilteredOthers();
+
+        let total = 0, answered = 0;
+
+        dList.forEach(d => {
+            total++;
+            const sel = dialogueSelections[d.id] || {};
+            const allFilled = d.blanks.every(b => sel[b.id] && sel[b.id] !== '');
+            if (allFilled) answered++;
+        });
+
+        oList.forEach(q => {
+            total++;
+            if (q.type === '写作') { answered++; return; }
+            if (otherSelections[q.id]) answered++;
+        });
+
+        const pct = total ? (answered / total * 100) : 0;
+        progressBar.style.width = `${pct}%`;
+        progressText.textContent = `${answered} / ${total} 题`;
+
+        let correct = 0, wrong = 0;
+
+        dList.forEach(d => {
+            const sel = dialogueSelections[d.id] || {};
+            const allFilled = d.blanks.every(b => sel[b.id] && sel[b.id] !== '');
+            if (allFilled) {
+                const allCorrect = d.blanks.every(b => isOptionCorrect(sel[b.id], b.answer));
+                if (allCorrect) correct++;
+                else wrong++;
+            }
+        });
+
+        oList.forEach(q => {
+            if (q.type === '写作') return;
+            const ans = otherSelections[q.id];
+            if (ans) {
+                if (isOptionCorrect(ans, q.answer)) correct++;
+                else wrong++;
+            }
+        });
+
+        correctCountEl.textContent = `✅ 正确 ${correct}`;
+        wrongCountEl.textContent = `❌ 错误 ${wrong}`;
+    }
+
+    function resetAll() {
+        dialogueSelections = {};
+        otherSelections = {};
+        document.querySelectorAll('select').forEach(s => s.value = '');
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+        renderAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.tabs button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.paper;
+            dialogueSelections = {};
+            otherSelections = {};
+            renderAll();
+        });
+    });
+
+    renderAll();
+
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+    document.getElementById('scrollToTopBtn').addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+</script>
+
+</body>
+</html>

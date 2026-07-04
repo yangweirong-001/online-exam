@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国近现代史纲要 · 在线答题</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f4fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.07);
+            padding: 30px 35px;
+        }
+        h1 {
+            font-size: 28px;
+            color: #0b1e33;
+            border-left: 6px solid #b22222;
+            padding-left: 18px;
+            margin-bottom: 2px;
+        }
+        .sub {
+            color: #5a6f84;
+            font-size: 15px;
+            padding-left: 24px;
+            margin-bottom: 22px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .tabs button {
+            border: none;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            background: #e6edf6;
+            color: #1f3a5f;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tabs button.active {
+            background: #8b1a1a;
+            color: white;
+            box-shadow: 0 4px 10px rgba(139, 26, 26, 0.3);
+        }
+        .tabs button:hover:not(.active) {
+            background: #d3deed;
+        }
+        .progress-wrap {
+            background: #e6edf6;
+            border-radius: 40px;
+            height: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #b22222, #d4a017);
+            border-radius: 40px;
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #1f2e41;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+        }
+        .stats span {
+            background: #f0f5fc;
+            padding: 3px 16px;
+            border-radius: 30px;
+        }
+        .stats .right {
+            color: #1a7a5e;
+        }
+        .stats .wrong {
+            color: #b1422e;
+        }
+        .question-block {
+            background: #fafdff;
+            border: 1px solid #dfe8f2;
+            border-radius: 18px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            transition: 0.15s;
+        }
+        .question-block.correct {
+            border-left: 6px solid #1f9a7a;
+            background: #f2fcf8;
+        }
+        .question-block.wrong {
+            border-left: 6px solid #d95b43;
+            background: #fdf6f2;
+        }
+        .question-block.unanswered {
+            border-left: 6px solid #c8d4e3;
+        }
+        .q-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #11212e;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .q-type {
+            display: inline-block;
+            background: #d3e0ef;
+            font-size: 11px;
+            padding: 0 12px;
+            border-radius: 30px;
+            color: #1f3a5f;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f2f7fe;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.12s;
+            border: 1.5px solid transparent;
+            font-size: 15px;
+        }
+        .option-label:hover {
+            background: #e6eefa;
+        }
+        .option-label input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #b22222;
+            flex-shrink: 0;
+        }
+        .option-label.selected {
+            border-color: #b22222;
+            background: #fde8e5;
+        }
+        .option-label.correct-answer {
+            border-color: #1f9a7a;
+            background: #d5f5ec;
+        }
+        .option-label.wrong-answer {
+            border-color: #d95b43;
+            background: #fce6de;
+        }
+        .feedback {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            display: none;
+            background: #f0f5fc;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .feedback.correct {
+            background: #def5ed;
+            color: #136b56;
+        }
+        .feedback.wrong {
+            background: #fce8e0;
+            color: #9e3f2b;
+        }
+        .feedback .correct-ans {
+            font-weight: 600;
+            color: #136b56;
+        }
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 28px 0 10px;
+        }
+        .btn {
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #e2eaf4;
+            color: #1f2e41;
+        }
+        .btn-primary {
+            background: #8b1a1a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #6e1515;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #b6cade;
+        }
+        .btn-outline:hover {
+            background: #eef3fa;
+        }
+        .footer-note {
+            font-size: 13px;
+            color: #758b9f;
+            text-align: center;
+            margin-top: 18px;
+            border-top: 1px solid #e4ecf5;
+            padding-top: 18px;
+        }
+        .writing-hint {
+            padding: 12px 16px;
+            background: #f0f7ff;
+            border-radius: 14px;
+            border: 1px solid #c5d9f0;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #1d3a57;
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+            .question-block {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📙 中国近现代史纲要</h1>
+        <div class="sub">A 卷 + C 卷 · 单选 · 多选 · 判断 · 论述</div>
+
+        <div class="tabs">
+            <button class="active" data-paper="all">📚 全部</button>
+            <button data-paper="A">📄 A 卷</button>
+            <button data-paper="C">📄 C 卷</button>
+        </div>
+
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="stats">
+            <span id="progressText">0 / 0 题</span>
+            <span class="right" id="correctCount">✅ 正确 0</span>
+            <span class="wrong" id="wrongCount">❌ 错误 0</span>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <div class="actions">
+            <button class="btn btn-outline" id="resetBtn">🔄 重新答题</button>
+            <button class="btn btn-primary" id="scrollToTopBtn">↑ 回到顶部</button>
+        </div>
+        <div class="footer-note">✔ 单选/多选/判断即时判对错 · 论述题显示参考答案</div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 中国近现代史纲要 · 全部题目
+        // ============================================================
+
+        function getPrefix(opt) {
+            const m = opt.match(/^([A-Da-d])[.、]\s*/);
+            return m ? m[1].toUpperCase() : null;
+        }
+
+        function isCorrect(selected, answer) {
+            if (!selected || !answer) return false;
+            const sp = getPrefix(selected);
+            const ap = getPrefix(answer);
+            if (sp && ap) return sp === ap;
+            if (sp) return sp === answer;
+            return selected === answer;
+        }
+
+        function getFullAnswer(options, answer) {
+            if (!options) return answer;
+            for (let o of options) {
+                if (isCorrect(o, answer)) return o;
+                if (o === answer) return o;
+            }
+            return answer;
+        }
+
+        function isMultiCorrect(selected, answer) {
+            if (!selected || !answer) return false;
+            const selLetters = selected.split(',').map(s => s.trim().charAt(0).toUpperCase()).sort().join('');
+            const ansLetters = answer.split('').map(s => s.trim().toUpperCase()).sort().join('');
+            return selLetters === ansLetters;
+        }
+
+        const allQuestions = [
+            // ==================== A 卷 ====================
+            // ---- 单选 15题 ----
+            { id: 'A_s1', paper: 'A', type: '单选题', question: '近代中国最主要矛盾', options: ['A. 封建主义与人民大众的矛盾', 'B. 资产阶级与无产阶级的矛盾', 'C. 帝国主义和中华民族的矛盾', 'D. 地主阶级与农民阶级的矛盾'], answer: 'C' },
+            { id: 'A_s2', paper: 'A', type: '单选题', question: '睁眼看世界第一人', options: ['A. 魏源', 'B. 林则徐', 'C. 龚自珍', 'D. 康有为'], answer: 'B' },
+            { id: 'A_s3', paper: 'A', type: '单选题', question: '率先举起马克思主义旗帜', options: ['A. 陈独秀', 'B. 李大钊', 'C. 毛泽东', 'D. 蔡元培'], answer: 'B' },
+            { id: 'A_s4', paper: 'A', type: '单选题', question: '新民主主义革命开端', options: ['A. 五四运动', 'B. 辛亥革命', 'C. 新文化运动', 'D. 中共一大'], answer: 'A' },
+            { id: 'A_s5', paper: 'A', type: '单选题', question: '首次明确反帝反封建纲领', options: ['A. 中共一大', 'B. 中共二大', 'C. 中共三大', 'D. 国民党一大'], answer: 'B' },
+            { id: 'A_s6', paper: 'A', type: '单选题', question: '长征转折性会议', options: ['A. 八七会议', 'B. 遵义会议', 'C. 瓦窑堡会议', 'D. 洛川会议'], answer: 'B' },
+            { id: 'A_s7', paper: 'A', type: '单选题', question: '中国革命新道路', options: ['A. 城市中心论', 'B. 议会斗争', 'C. 武装暴动', 'D. 农村包围城市，武装夺取政权'], answer: 'D' },
+            { id: 'A_s8', paper: 'A', type: '单选题', question: '全民族抗战首次大捷', options: ['A. 台儿庄战役', 'B. 百团大战', 'C. 平型关战役', 'D. 淞沪会战'], answer: 'C' },
+            { id: 'A_s9', paper: 'A', type: '单选题', question: '"将革命进行到底"', options: ['A. 旧民主主义革命', 'B. 新民主主义革命', 'C. 社会主义革命', 'D. 土地革命'], answer: 'B' },
+            { id: 'A_s10', paper: 'A', type: '单选题', question: '民众支持共产党的关键', options: ['A. 减租减息政策', 'B. 土地改革政策', 'C. 统一战线政策', 'D. 民主政权建设'], answer: 'B' },
+            { id: 'A_s11', paper: 'A', type: '单选题', question: '社会主义基本制度建立', options: ['A. 进入全面建设社会主义阶段', 'B. 完成民主革命任务', 'C. 实现工业化', 'D. 建立人民民主专政'], answer: 'A' },
+            { id: 'A_s12', paper: 'A', type: '单选题', question: '抗美援朝胜利意义', options: ['A. 保卫了国家安全', 'B. 打破美军不可战胜的神话', 'C. 提升国际地位', 'D. 以上都是'], answer: 'B' },
+            { id: 'A_s13', paper: 'A', type: '单选题', question: '过渡时期总路线特点', options: ['A. 优先发展重工业', 'B. 社会主义改造', 'C. 工业化建设', 'D. 社会主义建设与改造同时并举'], answer: 'D' },
+            { id: 'A_s14', paper: 'A', type: '单选题', question: '资本主义工商业改造目标', options: ['A. 公私合营企业', 'B. 社会主义性质的企业', 'C. 国家资本主义企业', 'D. 集体所有制企业'], answer: 'B' },
+            { id: 'A_s15', paper: 'A', type: '单选题', question: '全方位开放格局标志', options: ['A. 设立经济特区', 'B. 加入世贸组织', 'C. 沿海开放城市设立', 'D. 一带一路倡议'], answer: 'B' },
+
+            // ---- 多选 10题 ----
+            { id: 'A_m1', paper: 'A', type: '多选题', question: '近代两大历史任务', options: ['A. 民族独立和人民解放', 'B. 国家富强和人民富裕', 'C. 推翻封建主义', 'D. 建立资产阶级共和国'], answer: 'AB' },
+            { id: 'A_m2', paper: 'A', type: '多选题', question: '太平天国纲领', options: ['A. 《资治通鉴》', 'B. 《天朝田亩制度》', 'C. 《资政新篇》', 'D. 《海国图志》'], answer: 'BC' },
+            { id: 'A_m3', paper: 'A', type: '多选题', question: '洋务事业', options: ['A. 军用企业', 'B. 新式海军', 'C. 新式学堂', 'D. 派遣留学生', 'E. 民用企业'], answer: 'ABCD' },
+            { id: 'A_m4', paper: 'A', type: '多选题', question: '三民主义', options: ['A. 民主', 'B. 民族', 'C. 民权', 'D. 民生', 'E. 民治'], answer: 'BCD' },
+            { id: 'A_m5', paper: 'A', type: '多选题', question: '新文化运动口号', options: ['A. 民主', 'B. 科学', 'C. 自由', 'D. 平等', 'E. 博爱'], answer: 'AB' },
+            { id: 'A_m6', paper: 'A', type: '多选题', question: '三大武装起义', options: ['A. 南昌起义', 'B. 秋收起义', 'C. 广州起义', 'D. 武昌起义', 'E. 湘南起义'], answer: 'ABC' },
+            { id: 'A_m7', paper: 'A', type: '多选题', question: '"两个务必"', options: ['A. 务必保持艰苦奋斗作风', 'B. 谦虚谨慎不骄不躁', 'C. 务必保持廉洁自律', 'D. 艰苦奋斗', 'E. 敢于斗争'], answer: 'BD' },
+            { id: 'A_m8', paper: 'A', type: '多选题', question: '真理标准讨论意义', options: ['A. 冲击"两个凡是"', 'B. 解放思想', 'C. 提高认识', 'D. 马克思主义教育', 'E. 确立改革方向'], answer: 'ABCD' },
+            { id: 'A_m9', paper: 'A', type: '多选题', question: '家庭联产承包责任制', options: ['A. 保证国家的', 'B. 留足集体的', 'C. 剩下都是自己的', 'D. 按劳分配', 'E. 包产到户'], answer: 'ABD' },
+            { id: 'A_m10', paper: 'A', type: '多选题', question: '三步走战略', options: ['A. 翻一番', 'B. 小康', 'C. 中等发达国家水平', 'D. 现代化强国', 'E. 共同富裕'], answer: 'ABC' },
+
+            // ---- 判断 10题 ----
+            { id: 'A_j1', paper: 'A', type: '判断题', question: '反侵略失败根本原因=经济技术落后', options: ['正确', '错误'], answer: '错误' },
+            { id: 'A_j2', paper: 'A', type: '判断题', question: '戊戌变法是资产阶级思想启蒙运动', options: ['正确', '错误'], answer: '正确' },
+            { id: 'A_j3', paper: 'A', type: '判断题', question: '旧民主主义失败=无先进政党领导', options: ['正确', '错误'], answer: '错误' },
+            { id: 'A_j4', paper: 'A', type: '判断题', question: '新三民主义是第二次国共合作政治基础', options: ['正确', '错误'], answer: '正确' },
+            { id: 'A_j5', paper: 'A', type: '判断题', question: '遵义会议具有历史转折意义', options: ['正确', '错误'], answer: '正确' },
+            { id: 'A_j6', paper: 'A', type: '判断题', question: '相持阶段日本对国民党以政治诱降为主', options: ['正确', '错误'], answer: '正确' },
+            { id: 'A_j7', paper: 'A', type: '判断题', question: '一二九运动发生在1945年底昆明', options: ['正确', '错误'], answer: '错误' },
+            { id: 'A_j8', paper: 'A', type: '判断题', question: '主要矛盾变化决定历史阶段变化', options: ['正确', '错误'], answer: '正确' },
+            { id: 'A_j9', paper: 'A', type: '判断题', question: '改革开放是新的伟大革命', options: ['正确', '错误'], answer: '正确' },
+            { id: 'A_j10', paper: 'A', type: '判断题', question: '十九大标志进入全面小康决定性阶段', options: ['正确', '错误'], answer: '错误' },
+
+            // ---- 论述 2题 ----
+            { id: 'A_essay1', paper: 'A', type: '论述题', question: '新中国为什么选择社会主义道路？', answer: '【要点】①历史必然性：近代中国国情决定不能走资本主义道路；②社会主义优越性：集中力量办大事、保障人民根本利益；③国际环境：冷战格局下社会主义阵营的支持；④人民选择：土地改革和社会主义改造赢得人民拥护。', options: [] },
+            { id: 'A_essay2', paper: 'A', type: '论述题', question: '党的十八大以来党和国家事业发生了怎样的历史性变革？其意义是什么？', answer: '【要点】①全面深化改革取得重大突破；②脱贫攻坚全面胜利；③生态文明建设成效显著；④国防和军队现代化推进；⑤大国外交成就斐然；⑥全面从严治党成效卓著。意义：中国特色社会主义进入新时代，为实现中华民族伟大复兴提供了更为完善的制度保证、物质基础和精神力量。', options: [] },
+
+            // ==================== C 卷 ====================
+            // ---- 单选 10题 ----
+            { id: 'C_s1', paper: 'C', type: '单选题', question: '睁眼看世界第一人', options: ['A. 魏源', 'B. 林则徐', 'C. 龚自珍', 'D. 康有为'], answer: 'B' },
+            { id: 'C_s2', paper: 'C', type: '单选题', question: '洋务运动根本目的', options: ['A. 维护清王朝封建统治', 'B. 发展资本主义', 'C. 抵御外辱', 'D. 学习西方技术'], answer: 'A' },
+            { id: 'C_s3', paper: 'C', type: '单选题', question: '国共合作领导', options: ['A. 国民革命', 'B. 土地革命', 'C. 抗日战争', 'D. 解放战争'], answer: 'A' },
+            { id: 'C_s4', paper: 'C', type: '单选题', question: '确立毛泽东思想为指导思想', options: ['A. 中共六大', 'B. 中共六大', 'C. 党的七大', 'D. 党的八大'], answer: 'C' },
+            { id: 'C_s5', paper: 'C', type: '单选题', question: '和平解放的战役', options: ['A. 辽沈战役', 'B. 淮海战役', 'C. 平津战役', 'D. 渡江战役'], answer: 'C' },
+            { id: 'C_s6', paper: 'C', type: '单选题', question: '根本政治制度', options: ['A. 人民民主专政', 'B. 多党合作和政治协商制度', 'C. 民族区域自治制度', 'D. 人民代表大会制度'], answer: 'D' },
+            { id: 'C_s7', paper: 'C', type: '单选题', question: '十二大提出重大命题', options: ['A. 改革开放', 'B. 社会主义初级阶段', 'C. 建设有中国特色社会主义', 'D. 社会主义市场经济'], answer: 'C' },
+            { id: 'C_s8', paper: 'C', type: '单选题', question: '国家政治生活主题', options: ['A. 阶级矛盾', 'B. 路线斗争', 'C. 正确处理人民内部矛盾', 'D. 社会主义改造'], answer: 'C' },
+            { id: 'C_s9', paper: 'C', type: '单选题', question: '"调整、巩固、充实、提高"', options: ['A. 中共八届八中全会', 'B. 中共八届九中全会', 'C. 中共八届十中全会', 'D. 中共九大'], answer: 'B' },
+            { id: 'C_s10', paper: 'C', type: '单选题', question: '"三讲"教育内容', options: ['A. 讲学习、讲政治、讲纪律', 'B. 讲学习、讲政治、讲法制', 'C. 讲学习、讲政治、讲正气', 'D. 讲学习、讲政治、讲道德'], answer: 'C' },
+
+            // ---- 多选 10题 ----
+            { id: 'C_m1', paper: 'C', type: '多选题', question: '孙中山中心遗产', options: ['A. 革命实践', 'B. 三民主义纲领', 'C. 统一战线政策', 'D. 坚韧不拔精神', 'E. 民主共和思想'], answer: 'BCD' },
+            { id: 'C_m2', paper: 'C', type: '多选题', question: '五四运动正确表述', options: ['A. 反帝反封建的爱国运动', 'B. 新民主主义革命开端', 'C. 促进了马克思主义传播', 'D. 工人阶级登上历史舞台', 'E. 以上全部正确'], answer: 'ABCDE' },
+            { id: 'C_m3', paper: 'C', type: '多选题', question: '洋务运动正确表述', options: ['A. 未发动群众', 'B. 无先进阶级领导', 'C. 不能带进资本主义', 'D. 未认清帝国主义', 'E. 引进先进技术'], answer: 'ABCD' },
+            { id: 'C_m4', paper: 'C', type: '多选题', question: '党做的三件大事', options: ['A. 新民主主义革命', 'B. 社会主义革命', 'C. 全面建设社会主义', 'D. 改革开放', 'E. 脱贫攻坚'], answer: 'ABC' },
+            { id: 'C_m5', paper: 'C', type: '多选题', question: '中国抗战在世界反法西斯战争中的地位', options: ['A. 开辟东方主战场', 'B. 持续时间最长', 'C. 牵制日本主力', 'D. 为世界反法西斯战争作出重大贡献', 'E. 以上全部正确'], answer: 'ABCDE' },
+            { id: 'C_m6', paper: 'C', type: '多选题', question: '土改后农民积极性', options: ['A. 个体经济积极性', 'B. 集体经济积极性', 'C. 互助合作积极性', 'D. 革命积极性', 'E. 生产积极性'], answer: 'AC' },
+            { id: 'C_m7', paper: 'C', type: '多选题', question: '过渡时期经济成分', options: ['A. 国营经济', 'B. 合作社经济', 'C. 个体经济', 'D. 私人资本主义经济', 'E. 国家资本主义经济'], answer: 'ABCDE' },
+            { id: 'C_m8', paper: 'C', type: '多选题', question: '邓小平南方谈话', options: ['A. 改革也是解放生产力', 'B. 计划≠社会主义', 'C. 市场≠资本主义', 'D. 科技是第一生产力', 'E. 发展才是硬道理'], answer: 'ABCDE' },
+            { id: 'C_m9', paper: 'C', type: '多选题', question: '社会主义制度确立意义', options: ['A. 实现了中国历史上最深刻最伟大的社会变革', 'B. 为当代中国一切发展进步奠定了根本政治前提和制度基础', 'C. 为中国发展富强、中国人民生活富裕奠定了坚实基础', 'D. 实现了中华民族由近代衰落到根本扭转命运', 'E. 以上全部正确'], answer: 'ABCDE' },
+            { id: 'C_m10', paper: 'C', type: '多选题', question: '1978年至今的成就', options: ['A. 实现民族独立', 'B. 经济总量世界第二', 'C. 城镇化率提高', 'D. 高精尖领域进展', 'E. 全面建成小康社会'], answer: 'BCD' },
+
+            // ---- 判断 10题 ----
+            { id: 'C_j1', paper: 'C', type: '判断题', question: '近代两大主要矛盾', options: ['正确', '错误'], answer: '正确' },
+            { id: 'C_j2', paper: 'C', type: '判断题', question: '清末新政是维新运动的继续', options: ['正确', '错误'], answer: '错误' },
+            { id: 'C_j3', paper: 'C', type: '判断题', question: '辛亥革命失败=不能完成反帝反封建使命', options: ['正确', '错误'], answer: '正确' },
+            { id: 'C_j4', paper: 'C', type: '判断题', question: '洋务派口号是"民主"与"科学"', options: ['正确', '错误'], answer: '错误' },
+            { id: 'C_j5', paper: 'C', type: '判断题', question: '建军节标志=秋收起义', options: ['正确', '错误'], answer: '错误' },
+            { id: 'C_j6', paper: 'C', type: '判断题', question: '抗日民族统一战线是抗战胜利决定性因素', options: ['正确', '错误'], answer: '正确' },
+            { id: 'C_j7', paper: 'C', type: '判断题', question: '持久战战略思想是纲领性文献', options: ['正确', '错误'], answer: '正确' },
+            { id: 'C_j8', paper: 'C', type: '判断题', question: '五四运动反帝反封建彻底性', options: ['正确', '错误'], answer: '正确' },
+            { id: 'C_j9', paper: 'C', type: '判断题', question: '辛亥革命后走上资本主义道路', options: ['正确', '错误'], answer: '错误' },
+            { id: 'C_j10', paper: 'C', type: '判断题', question: '人民代表大会制度是根本政治制度', options: ['正确', '错误'], answer: '正确' },
+
+            // ---- 论述 2题 ----
+            { id: 'C_essay1', paper: 'C', type: '论述题', question: '怎样理解党团结和带领全国各族人民为民族复兴而努力奋斗的意义？', answer: '【要点】①党的初心使命：为中国人民谋幸福、为中华民族谋复兴；②历史脉络：从站起来、富起来到强起来的伟大飞跃；③人民主体地位：党的根基在人民、血脉在人民、力量在人民；④现实意义：团结奋斗是实现民族复兴的必由之路。', options: [] },
+            { id: 'C_essay2', paper: 'C', type: '论述题', question: '怎样理解中国特色社会主义进入新时代的意义？', answer: '【要点】①社会主要矛盾转化：人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾；②新的历史方位：中华民族迎来了从站起来、富起来到强起来的伟大飞跃；③全面建设社会主义现代化国家新征程开启；④中国特色社会主义道路、理论、制度、文化不断发展，为解决人类问题贡献了中国智慧和中国方案。', options: [] }
+        ];
+
+        // ============================================================
+        const container = document.getElementById('questionsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const correctCountEl = document.getElementById('correctCount');
+        const wrongCountEl = document.getElementById('wrongCount');
+
+        let currentFilter = 'all';
+        let selections = {};
+
+        function getFiltered() {
+            if (currentFilter === 'all') return allQuestions;
+            return allQuestions.filter(q => q.paper === currentFilter);
+        }
+
+        function render() {
+            const list = getFiltered();
+            container.innerHTML = '';
+            list.forEach((q, idx) => {
+                const block = document.createElement('div');
+                block.className = 'question-block unanswered';
+                block.id = `q-${q.id}`;
+
+                const title = document.createElement('div');
+                title.className = 'q-title';
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'q-type';
+                typeSpan.textContent = q.type;
+                title.appendChild(typeSpan);
+                title.innerHTML += ` ${idx+1}. ${q.question}`;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                if (!q.options || q.options.length === 0) {
+                    const note = document.createElement('div');
+                    note.className = 'writing-hint';
+                    note.innerHTML = `<strong>📖 参考答案：</strong>${q.answer}`;
+                    optionsDiv.appendChild(note);
+                    block.classList.remove('unanswered');
+                    block.classList.add('correct');
+                } else {
+                    const isMulti = q.type === '多选题';
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'option-label';
+                        const input = document.createElement('input');
+                        input.type = isMulti ? 'checkbox' : 'radio';
+                        input.name = q.id;
+                        input.value = opt;
+                        if (selections[q.id] && selections[q.id].includes(opt)) {
+                            input.checked = true;
+                            label.classList.add('selected');
+                        }
+                        input.addEventListener('change', function() {
+                            if (isMulti) {
+                                if (!selections[q.id]) selections[q.id] = [];
+                                if (this.checked) {
+                                    if (!selections[q.id].includes(opt)) selections[q.id].push(opt);
+                                } else {
+                                    selections[q.id] = selections[q.id].filter(s => s !== opt);
+                                }
+                                if (selections[q.id].length === 0) delete selections[q.id];
+                                handleMultiSelect(q.id);
+                            } else {
+                                if (this.checked) handleSelect(q.id, opt);
+                            }
+                        });
+                        label.appendChild(input);
+                        label.append(opt);
+                        optionsDiv.appendChild(label);
+                    });
+                }
+
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                feedback.id = `fb-${q.id}`;
+                if (selections[q.id] && q.options && q.options.length > 0) {
+                    const ok = q.type === '多选题' ?
+                        isMultiCorrect(selections[q.id].join(','), q.answer) :
+                        isCorrect(selections[q.id], q.answer);
+                    showFeedback(q.id, ok);
+                }
+
+                block.appendChild(title);
+                block.appendChild(optionsDiv);
+                block.appendChild(feedback);
+                container.appendChild(block);
+            });
+            updateProgress();
+        }
+
+        function handleSelect(qId, selected) {
+            selections[qId] = selected;
+            const q = allQuestions.find(q => q.id === qId);
+            const ok = isCorrect(selected, q.answer);
+            showFeedback(qId, ok);
+            updateBlockStyle(qId, ok);
+            updateProgress();
+        }
+
+        function handleMultiSelect(qId) {
+            const q = allQuestions.find(q => q.id === qId);
+            const sel = selections[qId] || [];
+            const ok = isMultiCorrect(sel.join(','), q.answer);
+            showFeedback(qId, ok);
+            updateBlockStyle(qId, ok);
+            updateProgress();
+        }
+
+        function updateBlockStyle(qId, ok) {
+            const block = document.getElementById(`q-${qId}`);
+            block.classList.remove('unanswered', 'correct', 'wrong');
+            block.classList.add(ok ? 'correct' : 'wrong');
+            const labels = block.querySelectorAll('.option-label');
+            const q = allQuestions.find(q => q.id === qId);
+            labels.forEach(label => {
+                const input = label.querySelector('input');
+                const val = input.value;
+                label.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                if (input.checked) label.classList.add('selected');
+                if (q && q.options) {
+                    const full = getFullAnswer(q.options, q.answer);
+                    if (full && val === full) label.classList.add('correct-answer');
+                    if (getPrefix(val) && getPrefix(val) === q.answer) label.classList.add('correct-answer');
+                }
+            });
+        }
+
+        function showFeedback(qId, ok) {
+            const q = allQuestions.find(q => q.id === qId);
+            const fb = document.getElementById(`fb-${qId}`);
+            if (!fb || !q || !q.options || q.options.length === 0) return;
+            fb.className = `feedback show ${ok ? 'correct' : 'wrong'}`;
+            let extra = '';
+            if (!ok) {
+                const full = getFullAnswer(q.options, q.answer);
+                extra = `<span class="correct-ans">正确答案：${full}</span>`;
+            }
+            fb.innerHTML = ok ? '✅ 回答正确！' : `❌ 回答错误。${extra}`;
+        }
+
+        function updateProgress() {
+            const list = getFiltered();
+            let total = list.length;
+            let answered = 0;
+            list.forEach(q => {
+                if (q.options && q.options.length > 0) {
+                    if (selections[q.id] && (Array.isArray(selections[q.id]) ? selections[q.id].length > 0 : true)) answered++;
+                } else {
+                    answered++;
+                }
+            });
+            const pct = total ? (answered / total * 100) : 0;
+            progressBar.style.width = `${pct}%`;
+            progressText.textContent = `${answered} / ${total} 题`;
+
+            let correct = 0,
+                wrong = 0;
+            list.forEach(q => {
+                if (q.options && q.options.length > 0 && selections[q.id]) {
+                    const ok = q.type === '多选题' ?
+                        isMultiCorrect(selections[q.id].join(','), q.answer) :
+                        isCorrect(selections[q.id], q.answer);
+                    if (ok) correct++;
+                    else wrong++;
+                }
+            });
+            correctCountEl.textContent = `✅ 正确 ${correct}`;
+            wrongCountEl.textContent = `❌ 错误 ${wrong}`;
+        }
+
+        function resetAll() {
+            selections = {};
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(r => r.checked = false);
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.paper;
+                selections = {};
+                render();
+            });
+        });
+
+        render();
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+        document.getElementById('scrollToTopBtn').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

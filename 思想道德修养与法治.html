@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>思想道德修养与法治 · 在线答题</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f4fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.07);
+            padding: 30px 35px;
+        }
+        h1 {
+            font-size: 28px;
+            color: #0b1e33;
+            border-left: 6px solid #8e44ad;
+            padding-left: 18px;
+            margin-bottom: 2px;
+        }
+        .sub {
+            color: #5a6f84;
+            font-size: 15px;
+            padding-left: 24px;
+            margin-bottom: 22px;
+        }
+        .progress-wrap {
+            background: #e6edf6;
+            border-radius: 40px;
+            height: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #8e44ad, #c0392b);
+            border-radius: 40px;
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #1f2e41;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+        }
+        .stats span {
+            background: #f0f5fc;
+            padding: 3px 16px;
+            border-radius: 30px;
+        }
+        .stats .right {
+            color: #1a7a5e;
+        }
+        .stats .wrong {
+            color: #b1422e;
+        }
+        .question-block {
+            background: #fafdff;
+            border: 1px solid #dfe8f2;
+            border-radius: 18px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            transition: 0.15s;
+        }
+        .question-block.correct {
+            border-left: 6px solid #1f9a7a;
+            background: #f2fcf8;
+        }
+        .question-block.wrong {
+            border-left: 6px solid #d95b43;
+            background: #fdf6f2;
+        }
+        .question-block.unanswered {
+            border-left: 6px solid #c8d4e3;
+        }
+        .q-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #11212e;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .q-type {
+            display: inline-block;
+            background: #d3e0ef;
+            font-size: 11px;
+            padding: 0 12px;
+            border-radius: 30px;
+            color: #1f3a5f;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f2f7fe;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.12s;
+            border: 1.5px solid transparent;
+            font-size: 15px;
+        }
+        .option-label:hover {
+            background: #e6eefa;
+        }
+        .option-label input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #8e44ad;
+            flex-shrink: 0;
+        }
+        .option-label.selected {
+            border-color: #8e44ad;
+            background: #f3e8fa;
+        }
+        .option-label.correct-answer {
+            border-color: #1f9a7a;
+            background: #d5f5ec;
+        }
+        .option-label.wrong-answer {
+            border-color: #d95b43;
+            background: #fce6de;
+        }
+        .feedback {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            display: none;
+            background: #f0f5fc;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .feedback.correct {
+            background: #def5ed;
+            color: #136b56;
+        }
+        .feedback.wrong {
+            background: #fce8e0;
+            color: #9e3f2b;
+        }
+        .feedback .correct-ans {
+            font-weight: 600;
+            color: #136b56;
+        }
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 28px 0 10px;
+        }
+        .btn {
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #e2eaf4;
+            color: #1f2e41;
+        }
+        .btn-primary {
+            background: #6c3483;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #512e5f;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #b6cade;
+        }
+        .btn-outline:hover {
+            background: #eef3fa;
+        }
+        .footer-note {
+            font-size: 13px;
+            color: #758b9f;
+            text-align: center;
+            margin-top: 18px;
+            border-top: 1px solid #e4ecf5;
+            padding-top: 18px;
+        }
+        .writing-hint {
+            padding: 12px 16px;
+            background: #f0f7ff;
+            border-radius: 14px;
+            border: 1px solid #c5d9f0;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #1d3a57;
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+            .question-block {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📗 思想道德修养与法治</h1>
+        <div class="sub">名词解释 · 简答 · 辨析 · 问答</div>
+
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="stats">
+            <span id="progressText">0 / 0 题</span>
+            <span class="right" id="correctCount">✅ 正确 0</span>
+            <span class="wrong" id="wrongCount">❌ 错误 0</span>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <div class="actions">
+            <button class="btn btn-outline" id="resetBtn">🔄 重新答题</button>
+            <button class="btn btn-primary" id="scrollToTopBtn">↑ 回到顶部</button>
+        </div>
+        <div class="footer-note">✔ 辨析题即时判对错 · 名词解释/简答/问答显示参考答案</div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 思想道德修养与法治 · 全部题目
+        // ============================================================
+
+        function getPrefix(opt) {
+            const m = opt.match(/^([A-Da-d])[.、]\s*/);
+            return m ? m[1].toUpperCase() : null;
+        }
+
+        function isCorrect(selected, answer) {
+            if (!selected || !answer) return false;
+            const sp = getPrefix(selected);
+            const ap = getPrefix(answer);
+            if (sp && ap) return sp === ap;
+            if (sp) return sp === answer;
+            return selected === answer;
+        }
+
+        function getFullAnswer(options, answer) {
+            if (!options) return answer;
+            for (let o of options) {
+                if (isCorrect(o, answer)) return o;
+                if (o === answer) return o;
+            }
+            return answer;
+        }
+
+        const questions = [
+            // ---- 名词解释 4题 ----
+            { id: 'n1', type: '名词解释', question: '人的本质', answer: '一切社会关系的总和。包括家庭关系、地缘关系、学缘关系、业缘关系、经济关系、政治关系、法律关系、道德关系等。', options: [] },
+            { id: 'n2', type: '名词解释', question: '社会理想', answer: '社会集体乃至社会全体成员的共同理想，即在全社会占主导地位的共同奋斗目标。', options: [] },
+            { id: 'n3', type: '名词解释', question: '爱国主义的四大内涵', answer: '①爱祖国的大好河山；②爱自己的骨肉同胞；③爱祖国的灿烂文化；④爱自己的国家。', options: [] },
+            { id: 'n4', type: '名词解释', question: '社会公德', answer: '人们在社会交往和公共生活中应该遵守的行为准则，是维护公共利益、公共秩序、社会和谐稳定的起码道德要求，涵盖人与人、人与社会、人与自然之间的关系。', options: [] },
+
+            // ---- 简答 3题 ----
+            { id: 's1', type: '简答题', question: '信念的内涵与特征', answer: '信念是人们在认识基础上确立的对某种思想或事物坚信不疑并身体力行的精神状态，是认知、情感和意志的有机统一体。特征：①执着性；②支撑性；③多样性。', options: [] },
+            { id: 's2', type: '简答题', question: '为什么要信仰马克思主义', answer: '①认识世界、改造世界的强大思想武器；②科学的理论，揭示人类社会发展规律；③人民的理论，创立人民解放的思想体系；④实践的理论，指引人民改造世界；⑤不断发展的开放理论，站在时代前沿；⑥科学预测未来社会理想状态。', options: [] },
+            { id: 's3', type: '简答题', question: '如何理解集体主义', answer: '集体主义是调节国家利益、社会整体利益和个人利益关系的基本原则。①强调国家利益、社会整体利益和个人利益的辩证统一；②强调国家利益、社会整体利益高于个人利益；③重视和保障个人的正当利益。', options: [] },
+
+            // ---- 辨析 3题 ----
+            { id: 'j1', type: '辨析题', question: '职业道德基本要求：爱岗敬业、诚实守信、办事公道、热情服务和奉献社会', options: ['正确', '错误'], answer: '正确' },
+            { id: 'j2', type: '辨析题', question: '"为了个人利益，可以不择手段"', options: ['正确', '错误'], answer: '错误' },
+            { id: 'j3', type: '辨析题', question: '"名表名包既是身份象征，是人生价值的彰显"', options: ['正确', '错误'], answer: '错误' },
+
+            // ---- 问答 4题 ----
+            { id: 'q1', type: '问答题', question: '理想的内涵与特征', answer: '理想是人们在实践中形成的、有实现可能性的、对未来社会和自身发展目标的向往与追求。分类：个人理想/社会理想、近期/远期、生活/职业/道德/政治理想。特征：①超越性；②实践性；③时代性。', options: [] },
+            { id: 'q2', type: '问答题', question: '如何理解社会主义核心价值观', answer: '①国家层面：富强、民主、文明、和谐；②社会层面：自由、平等、公正、法治；③公民层面：爱国、敬业、诚信、友善。', options: [] },
+            { id: 'q3', type: '问答题', question: '道德的作用', answer: '道德具有认识、规范、调节、激励、导向、教育等功能。①"国无德不兴，人无德不立"；②对巩固经济基础和上层建筑有不可替代的作用；③是提高人的精神境界、促进自我完善、推动全面发展的内在动力。', options: [] },
+            { id: 'q4', type: '问答题', question: '对法律遵守的理解', answer: '①法律遵守指国家机关、社会组织和公民依法行使权力/权利、履行职责/义务的活动；②守法不仅意味着履行义务，还意味着一切组织和个人都依法规范行为；③守法是法律实施和实现的基本途径；④一切组织和个人都必须遵守宪法和法律。', options: [] }
+        ];
+
+        // ============================================================
+        const container = document.getElementById('questionsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const correctCountEl = document.getElementById('correctCount');
+        const wrongCountEl = document.getElementById('wrongCount');
+
+        let selections = {};
+
+        function render() {
+            container.innerHTML = '';
+            questions.forEach((q, idx) => {
+                const block = document.createElement('div');
+                block.className = 'question-block unanswered';
+                block.id = `q-${q.id}`;
+
+                const title = document.createElement('div');
+                title.className = 'q-title';
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'q-type';
+                typeSpan.textContent = q.type;
+                title.appendChild(typeSpan);
+                title.innerHTML += ` ${idx+1}. ${q.question}`;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                if (!q.options || q.options.length === 0) {
+                    const note = document.createElement('div');
+                    note.className = 'writing-hint';
+                    note.innerHTML = `<strong>📖 参考答案：</strong>${q.answer}`;
+                    optionsDiv.appendChild(note);
+                    block.classList.remove('unanswered');
+                    block.classList.add('correct');
+                } else {
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'option-label';
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = q.id;
+                        radio.value = opt;
+                        if (selections[q.id] === opt) {
+                            radio.checked = true;
+                            label.classList.add('selected');
+                        }
+                        radio.addEventListener('change', function() {
+                            if (this.checked) handleSelect(q.id, opt);
+                        });
+                        label.appendChild(radio);
+                        label.append(opt);
+                        optionsDiv.appendChild(label);
+                    });
+                }
+
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                feedback.id = `fb-${q.id}`;
+                if (selections[q.id] && q.options && q.options.length > 0) {
+                    const ok = isCorrect(selections[q.id], q.answer);
+                    showFeedback(q.id, ok);
+                }
+
+                block.appendChild(title);
+                block.appendChild(optionsDiv);
+                block.appendChild(feedback);
+                container.appendChild(block);
+            });
+            updateProgress();
+        }
+
+        function handleSelect(qId, selected) {
+            selections[qId] = selected;
+            const q = questions.find(q => q.id === qId);
+            const ok = isCorrect(selected, q.answer);
+            showFeedback(qId, ok);
+
+            const block = document.getElementById(`q-${qId}`);
+            block.classList.remove('unanswered', 'correct', 'wrong');
+            block.classList.add(ok ? 'correct' : 'wrong');
+
+            const labels = block.querySelectorAll('.option-label');
+            labels.forEach(label => {
+                const radio = label.querySelector('input[type="radio"]');
+                const val = radio.value;
+                label.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                if (val === selected) {
+                    label.classList.add('selected');
+                    if (ok) label.classList.add('correct-answer');
+                    else label.classList.add('wrong-answer');
+                }
+                const full = getFullAnswer(q.options, q.answer);
+                if (full && val === full) label.classList.add('correct-answer');
+                if (getPrefix(val) && getPrefix(val) === q.answer) label.classList.add('correct-answer');
+            });
+            updateProgress();
+        }
+
+        function showFeedback(qId, ok) {
+            const q = questions.find(q => q.id === qId);
+            const fb = document.getElementById(`fb-${qId}`);
+            if (!fb || !q || !q.options || q.options.length === 0) return;
+            fb.className = `feedback show ${ok ? 'correct' : 'wrong'}`;
+            let extra = '';
+            if (!ok) {
+                const full = getFullAnswer(q.options, q.answer);
+                extra = `<span class="correct-ans">正确答案：${full}</span>`;
+            }
+            fb.innerHTML = ok ? '✅ 回答正确！' : `❌ 回答错误。${extra}`;
+        }
+
+        function updateProgress() {
+            let total = questions.length;
+            let answered = 0;
+            questions.forEach(q => {
+                if (q.options && q.options.length > 0) {
+                    if (selections[q.id]) answered++;
+                } else {
+                    answered++;
+                }
+            });
+            const pct = total ? (answered / total * 100) : 0;
+            progressBar.style.width = `${pct}%`;
+            progressText.textContent = `${answered} / ${total} 题`;
+
+            let correct = 0,
+                wrong = 0;
+            questions.forEach(q => {
+                if (q.options && q.options.length > 0 && selections[q.id]) {
+                    if (isCorrect(selections[q.id], q.answer)) correct++;
+                    else wrong++;
+                }
+            });
+            correctCountEl.textContent = `✅ 正确 ${correct}`;
+            wrongCountEl.textContent = `❌ 错误 ${wrong}`;
+        }
+
+        function resetAll() {
+            selections = {};
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        render();
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+        document.getElementById('scrollToTopBtn').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

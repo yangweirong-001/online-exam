@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>马克思主义基本原理 · 在线答题</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f4fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.07);
+            padding: 30px 35px;
+        }
+        h1 {
+            font-size: 28px;
+            color: #0b1e33;
+            border-left: 6px solid #c0392b;
+            padding-left: 18px;
+            margin-bottom: 2px;
+        }
+        .sub {
+            color: #5a6f84;
+            font-size: 15px;
+            padding-left: 24px;
+            margin-bottom: 22px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .tabs button {
+            border: none;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            background: #e6edf6;
+            color: #1f3a5f;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tabs button.active {
+            background: #8e1f1a;
+            color: white;
+            box-shadow: 0 4px 10px rgba(142, 31, 26, 0.25);
+        }
+        .tabs button:hover:not(.active) {
+            background: #d3deed;
+        }
+        .progress-wrap {
+            background: #e6edf6;
+            border-radius: 40px;
+            height: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #c0392b, #e67e22);
+            border-radius: 40px;
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #1f2e41;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+        }
+        .stats span {
+            background: #f0f5fc;
+            padding: 3px 16px;
+            border-radius: 30px;
+        }
+        .stats .right {
+            color: #1a7a5e;
+        }
+        .stats .wrong {
+            color: #b1422e;
+        }
+        .question-block {
+            background: #fafdff;
+            border: 1px solid #dfe8f2;
+            border-radius: 18px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            transition: 0.15s;
+        }
+        .question-block.correct {
+            border-left: 6px solid #1f9a7a;
+            background: #f2fcf8;
+        }
+        .question-block.wrong {
+            border-left: 6px solid #d95b43;
+            background: #fdf6f2;
+        }
+        .question-block.unanswered {
+            border-left: 6px solid #c8d4e3;
+        }
+        .q-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #11212e;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .q-type {
+            display: inline-block;
+            background: #d3e0ef;
+            font-size: 11px;
+            padding: 0 12px;
+            border-radius: 30px;
+            color: #1f3a5f;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f2f7fe;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.12s;
+            border: 1.5px solid transparent;
+            font-size: 15px;
+        }
+        .option-label:hover {
+            background: #e6eefa;
+        }
+        .option-label input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #c0392b;
+            flex-shrink: 0;
+        }
+        .option-label.selected {
+            border-color: #c0392b;
+            background: #fde8e5;
+        }
+        .option-label.correct-answer {
+            border-color: #1f9a7a;
+            background: #d5f5ec;
+        }
+        .option-label.wrong-answer {
+            border-color: #d95b43;
+            background: #fce6de;
+        }
+        .feedback {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            display: none;
+            background: #f0f5fc;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .feedback.correct {
+            background: #def5ed;
+            color: #136b56;
+        }
+        .feedback.wrong {
+            background: #fce8e0;
+            color: #9e3f2b;
+        }
+        .feedback .correct-ans {
+            font-weight: 600;
+            color: #136b56;
+        }
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 28px 0 10px;
+        }
+        .btn {
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #e2eaf4;
+            color: #1f2e41;
+        }
+        .btn-primary {
+            background: #8e1f1a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #6e1814;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #b6cade;
+        }
+        .btn-outline:hover {
+            background: #eef3fa;
+        }
+        .footer-note {
+            font-size: 13px;
+            color: #758b9f;
+            text-align: center;
+            margin-top: 18px;
+            border-top: 1px solid #e4ecf5;
+            padding-top: 18px;
+        }
+        .writing-hint {
+            padding: 12px 16px;
+            background: #f0f7ff;
+            border-radius: 14px;
+            border: 1px solid #c5d9f0;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #1d3a57;
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+            .question-block {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📕 马克思主义基本原理</h1>
+        <div class="sub">A 卷 + B 卷 · 单选 · 多选 · 简答 · 论述</div>
+
+        <div class="tabs">
+            <button class="active" data-paper="all">📚 全部</button>
+            <button data-paper="A">📄 A 卷</button>
+            <button data-paper="B">📄 B 卷</button>
+        </div>
+
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="stats">
+            <span id="progressText">0 / 0 题</span>
+            <span class="right" id="correctCount">✅ 正确 0</span>
+            <span class="wrong" id="wrongCount">❌ 错误 0</span>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <div class="actions">
+            <button class="btn btn-outline" id="resetBtn">🔄 重新答题</button>
+            <button class="btn btn-primary" id="scrollToTopBtn">↑ 回到顶部</button>
+        </div>
+        <div class="footer-note">✔ 单选/多选即时判对错 · 简答/论述显示参考答案</div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 马克思主义基本原理 · 全部题目
+        // ============================================================
+
+        // ----- 工具函数 -----
+        function getPrefix(opt) {
+            const m = opt.match(/^([A-Da-d])[.、]\s*/);
+            return m ? m[1].toUpperCase() : null;
+        }
+
+        function isCorrect(selected, answer) {
+            if (!selected || !answer) return false;
+            const selPrefix = getPrefix(selected);
+            const ansPrefix = getPrefix(answer);
+            if (selPrefix && ansPrefix) return selPrefix === ansPrefix;
+            if (selPrefix) return selPrefix === answer;
+            return selected === answer;
+        }
+
+        function getFullAnswer(options, answer) {
+            if (!options) return answer;
+            for (let o of options) {
+                if (isCorrect(o, answer)) return o;
+                if (o === answer) return o;
+            }
+            return answer;
+        }
+
+        const allQuestions = [
+            // ==================== A 卷 ====================
+            // ---- 单选 10题 ----
+            { id: 'A_s1', paper: 'A', type: '单选题', question: '唯物辩证法的总观点', options: ['A. 物质和意识', 'B. 联系和发展', 'C. 运动和静止', 'D. 量变和质变'], answer: 'B' },
+            { id: 'A_s2', paper: 'A', type: '单选题', question: '马克思主义世界观方法论核心', options: ['A. 唯物辩证法', 'B. 历史唯物主义', 'C. 剩余价值学说', 'D. 科学社会主义'], answer: 'A' },
+            { id: 'A_s3', paper: 'A', type: '单选题', question: '相对真理', options: ['A. 永恒不变的真理', 'B. 绝对正确的认识', 'C. 终极真理', 'D. 有一定限度和条件的真理'], answer: 'D' },
+            { id: 'A_s4', paper: 'A', type: '单选题', question: '商品价值量决定', options: ['A. 个别劳动时间', 'B. 剩余劳动时间', 'C. 社会必要劳动时间', 'D. 必要劳动时间'], answer: 'C' },
+            { id: 'A_s5', paper: 'A', type: '单选题', question: '剩余价值源泉', options: ['A. 劳动工具', 'B. 劳动对象', 'C. 必要劳动', 'D. 剩余劳动'], answer: 'D' },
+            { id: 'A_s6', paper: 'A', type: '单选题', question: '"城门失火殃及池鱼"体现', options: ['A. 联系的观点', 'B. 发展的观点', 'C. 矛盾的观点', 'D. 否定的观点'], answer: 'A' },
+            { id: 'A_s7', paper: 'A', type: '单选题', question: '历史的创造者', options: ['A. 英雄人物', 'B. 人民群众', 'C. 统治阶级', 'D. 知识分子'], answer: 'B' },
+            { id: 'A_s8', paper: 'A', type: '单选题', question: '资本主义基本矛盾', options: ['A. 无产阶级与资产阶级的矛盾', 'B. 生产与消费的矛盾', 'C. 生产社会化与生产资料资本主义私人占有之间的矛盾', 'D. 经济基础与上层建筑的矛盾'], answer: 'C' },
+            { id: 'A_s9', paper: 'A', type: '单选题', question: '生产关系中起决定作用', options: ['A. 生产资料所有制', 'B. 产品分配方式', 'C. 生产中人与人的关系', 'D. 生产力水平'], answer: 'A' },
+            { id: 'A_s10', paper: 'A', type: '单选题', question: '共产主义的含义', options: ['A. 一种社会制度', 'B. 一种意识形态', 'C. 一种理想', 'D. 以建立共产主义为目标的实际运动'], answer: 'D' },
+
+            // ---- 多选 10题 ----
+            { id: 'A_m1', paper: 'A', type: '多选题', question: '马克思主义是', options: ['A. 关于社会主义代替资本主义的学说', 'B. 指导思想', 'C. 关于人的解放的学说', 'D. 关于一般规律的学说', 'E. 关于阶级斗争的学说'], answer: 'ABDE' },
+            { id: 'A_m2', paper: 'A', type: '多选题', question: '实践对认识的决定作用', options: ['A. 来源', 'B. 发展动力', 'C. 检验标准', 'D. 目的', 'E. 唯一途径'], answer: 'ABCD' },
+            { id: 'A_m3', paper: 'A', type: '多选题', question: '国家垄断资本主义形式', options: ['A. 国家直接经营企业', 'B. 参与私人资本再生产', 'C. 法律规范', 'D. 宏观调节', 'E. 国家与私人合营'], answer: 'ABCDE' },
+            { id: 'A_m4', paper: 'A', type: '多选题', question: '意识形态包括', options: ['A. 政治法律思想', 'B. 自然科学', 'C. 宗教', 'D. 艺术', 'E. 哲学'], answer: 'ACE' },
+            { id: 'A_m5', paper: 'A', type: '多选题', question: '社会存在主要包括', options: ['A. 自然地理环境', 'B. 社会心理', 'C. 人口因素', 'D. 物质生产方式', 'E. 社会意识'], answer: 'ACD' },
+            { id: 'A_m6', paper: 'A', type: '多选题', question: '群众观点', options: ['A. 相信群众', 'B. 自己解放自己', 'C. 全心全意为人民服务', 'D. 向人民负责', 'E. 虚心向群众学习'], answer: 'BCDE' },
+            { id: 'A_m7', paper: 'A', type: '多选题', question: '经济全球化负面影响', options: ['A. 经济增长加快', 'B. 地位不平等', 'C. 资源短缺和污染', 'D. 增加经济风险', 'E. 技术进步加速'], answer: 'BDE' },
+            { id: 'A_m8', paper: 'A', type: '多选题', question: '金融寡头控制国家机器', options: ['A. 收买高官', 'B. 政策咨询', 'C. 代理人执政', 'D. 聘请前高官', 'E. 控制舆论'], answer: 'ABCDE' },
+            { id: 'A_m9', paper: 'A', type: '多选题', question: '科学社会主义直接思想来源', options: ['A. 康德', 'B. 黑格尔', 'C. 傅立叶', 'D. 圣西门', 'E. 欧文'], answer: 'CDE' },
+            { id: 'A_m10', paper: 'A', type: '多选题', question: '共产主义社会基本特征', options: ['A. 生产资料公有', 'B. 消灭社会差别', 'C. 阶级消灭', 'D. 国家消亡', 'E. 物质极大丰富'], answer: 'ABCDE' },
+
+            // ---- 简答 3题 ----
+            { id: 'A_short1', paper: 'A', type: '简答题', question: '哲学基本问题及其内容', answer: '哲学基本问题是思维与存在的关系问题。第一方面：何者为第一性→划分唯物主义与唯心主义；第二方面：有无同一性→划分可知论与不可知论。', options: [] },
+            { id: 'A_short2', paper: 'A', type: '简答题', question: '商品使用价值和价值的关系', answer: '对立统一：对立——二者不可兼得，生产者要价值就必须让渡使用价值；统一——商品必须同时具有二者，使用价值是价值的物质承担者。', options: [] },
+            { id: 'A_short3', paper: 'A', type: '简答题', question: '劳动力商品的使用价值和价值特点', answer: '价值：维持劳动者本人、家属生存及教育培训所需生活资料价值，含历史和道德因素。使用价值：是价值的源泉，能创造比自身价值更大的新价值（剩余价值）。', options: [] },
+
+            // ---- 论述 1题 ----
+            { id: 'A_essay', paper: 'A', type: '论述题', question: '如何理解资本主义制度？', answer: '要点：①资本主义经济特点（私有制、雇佣劳动、剩余价值剥削）；②政治特点（资产阶级专政、形式民主）；③历史进步性（取代封建制度、推动生产力）；④历史局限性（基本矛盾不可克服、周期性危机）；⑤必然被社会主义取代是人类社会发展规律决定的。', options: [] },
+
+            // ==================== B 卷 ====================
+            // ---- 单选 10题 ----
+            { id: 'B_s1', paper: 'B', type: '单选题', question: '商品价值量决定', options: ['A. 个别劳动时间', 'B. 剩余劳动时间', 'C. 社会必要劳动时间', 'D. 必要劳动时间'], answer: 'C' },
+            { id: 'B_s2', paper: 'B', type: '单选题', question: '马克思主义世界观方法论核心', options: ['A. 唯物辩证法', 'B. 历史唯物主义', 'C. 剩余价值学说', 'D. 科学社会主义'], answer: 'A' },
+            { id: 'B_s3', paper: 'B', type: '单选题', question: '历史的创造者', options: ['A. 英雄人物', 'B. 人民群众', 'C. 统治阶级', 'D. 知识分子'], answer: 'B' },
+            { id: 'B_s4', paper: 'B', type: '单选题', question: '唯物辩证法的总观点', options: ['A. 物质和意识', 'B. 联系和发展', 'C. 运动和静止', 'D. 量变和质变'], answer: 'B' },
+            { id: 'B_s5', paper: 'B', type: '单选题', question: '剩余价值源泉', options: ['A. 劳动工具', 'B. 劳动对象', 'C. 必要劳动', 'D. 剩余劳动'], answer: 'D' },
+            { id: 'B_s6', paper: 'B', type: '单选题', question: '"城门失火殃及池鱼"体现', options: ['A. 联系的观点', 'B. 发展的观点', 'C. 矛盾的观点', 'D. 否定的观点'], answer: 'A' },
+            { id: 'B_s7', paper: 'B', type: '单选题', question: '相对真理', options: ['A. 永恒不变的真理', 'B. 绝对正确的认识', 'C. 终极真理', 'D. 有一定限度和条件的真理'], answer: 'D' },
+            { id: 'B_s8', paper: 'B', type: '单选题', question: '资本主义基本矛盾', options: ['A. 无产阶级与资产阶级的矛盾', 'B. 生产与消费的矛盾', 'C. 生产社会化与生产资料资本主义私人占有之间的矛盾', 'D. 经济基础与上层建筑的矛盾'], answer: 'C' },
+            { id: 'B_s9', paper: 'B', type: '单选题', question: '生产关系中起决定作用', options: ['A. 生产资料所有制', 'B. 产品分配方式', 'C. 生产中人与人的关系', 'D. 生产力水平'], answer: 'A' },
+            { id: 'B_s10', paper: 'B', type: '单选题', question: '共产主义的含义', options: ['A. 一种社会制度', 'B. 一种意识形态', 'C. 一种理想', 'D. 以建立共产主义为目标的实际运动'], answer: 'D' },
+
+            // ---- 多选 10题 ----
+            { id: 'B_m1', paper: 'B', type: '多选题', question: '马克思主义是', options: ['A. 关于社会主义代替资本主义的学说', 'B. 指导思想', 'C. 关于人的解放的学说', 'D. 关于一般规律的学说', 'E. 关于阶级斗争的学说'], answer: 'ABDE' },
+            { id: 'B_m2', paper: 'B', type: '多选题', question: '社会存在主要包括', options: ['A. 自然地理环境', 'B. 社会心理', 'C. 人口因素', 'D. 物质生产方式', 'E. 社会意识'], answer: 'ACD' },
+            { id: 'B_m3', paper: 'B', type: '多选题', question: '国家垄断资本主义形式', options: ['A. 国家直接经营企业', 'B. 参与私人资本再生产', 'C. 法律规范', 'D. 宏观调节', 'E. 国家与私人合营'], answer: 'ABCDE' },
+            { id: 'B_m4', paper: 'B', type: '多选题', question: '科学社会主义直接思想来源', options: ['A. 康德', 'B. 黑格尔', 'C. 傅立叶', 'D. 圣西门', 'E. 欧文'], answer: 'CDE' },
+            { id: 'B_m5', paper: 'B', type: '多选题', question: '实践对认识的决定作用', options: ['A. 来源', 'B. 发展动力', 'C. 检验标准', 'D. 目的', 'E. 唯一途径'], answer: 'ABCD' },
+            { id: 'B_m6', paper: 'B', type: '多选题', question: '群众观点', options: ['A. 相信群众', 'B. 自己解放自己', 'C. 全心全意为人民服务', 'D. 向人民负责', 'E. 虚心向群众学习'], answer: 'BCDE' },
+            { id: 'B_m7', paper: 'B', type: '多选题', question: '经济全球化负面影响', options: ['A. 经济增长加快', 'B. 地位不平等', 'C. 资源短缺和污染', 'D. 增加经济风险', 'E. 技术进步加速'], answer: 'BDE' },
+            { id: 'B_m8', paper: 'B', type: '多选题', question: '金融寡头控制国家机器', options: ['A. 收买高官', 'B. 政策咨询', 'C. 代理人执政', 'D. 聘请前高官', 'E. 控制舆论'], answer: 'ABCDE' },
+            { id: 'B_m9', paper: 'B', type: '多选题', question: '意识形态包括', options: ['A. 政治法律思想', 'B. 自然科学', 'C. 宗教', 'D. 艺术', 'E. 哲学'], answer: 'ACE' },
+            { id: 'B_m10', paper: 'B', type: '多选题', question: '共产主义社会基本特征', options: ['A. 生产资料公有', 'B. 消灭社会差别', 'C. 阶级消灭', 'D. 国家消亡', 'E. 物质极大丰富'], answer: 'ABCDE' },
+
+            // ---- 简答 3题 ----
+            { id: 'B_short1', paper: 'B', type: '简答题', question: '世界的物质统一性原理', answer: '①自然界是物质的；②人类社会本质上是物质的；③人的意识统一于物质；④世界的物质统一性是多样性的统一。这是辩证唯物主义最基本的观点，是马克思主义的基石。', options: [] },
+            { id: 'B_short2', paper: 'B', type: '简答题', question: '商品使用价值和价值的关系', answer: '对立统一：对立——二者不可兼得，生产者要价值就必须让渡使用价值；统一——商品必须同时具有二者，使用价值是价值的物质承担者。', options: [] },
+            { id: 'B_short3', paper: 'B', type: '简答题', question: '劳动力商品的使用价值和价值特点', answer: '价值：维持劳动者本人、家属生存及教育培训所需生活资料价值，含历史和道德因素。使用价值：是价值的源泉，能创造比自身价值更大的新价值（剩余价值）。', options: [] },
+
+            // ---- 论述 1题 ----
+            { id: 'B_essay', paper: 'B', type: '论述题', question: '如何理解资本主义制度？', answer: '要点：①资本主义经济特点（私有制、雇佣劳动、剩余价值剥削）；②政治特点（资产阶级专政、形式民主）；③历史进步性（取代封建制度、推动生产力）；④历史局限性（基本矛盾不可克服、周期性危机）；⑤必然被社会主义取代是人类社会发展规律决定的。', options: [] }
+        ];
+
+        // ============================================================
+        // 渲染引擎
+        // ============================================================
+        const container = document.getElementById('questionsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const correctCountEl = document.getElementById('correctCount');
+        const wrongCountEl = document.getElementById('wrongCount');
+
+        let currentFilter = 'all';
+        let selections = {};
+
+        function getFiltered() {
+            if (currentFilter === 'all') return allQuestions;
+            return allQuestions.filter(q => q.paper === currentFilter);
+        }
+
+        function render() {
+            const list = getFiltered();
+            container.innerHTML = '';
+            list.forEach((q, idx) => {
+                const block = document.createElement('div');
+                block.className = 'question-block unanswered';
+                block.id = `q-${q.id}`;
+
+                const title = document.createElement('div');
+                title.className = 'q-title';
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'q-type';
+                typeSpan.textContent = q.type;
+                title.appendChild(typeSpan);
+                title.innerHTML += ` ${idx+1}. ${q.question}`;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                // 无选项（简答/论述）
+                if (!q.options || q.options.length === 0) {
+                    const note = document.createElement('div');
+                    note.className = 'writing-hint';
+                    note.innerHTML = `<strong>📖 参考答案：</strong>${q.answer}`;
+                    optionsDiv.appendChild(note);
+                    block.classList.remove('unanswered');
+                    block.classList.add('correct');
+                } else {
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'option-label';
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = q.id;
+                        radio.value = opt;
+                        if (selections[q.id] === opt) {
+                            radio.checked = true;
+                            label.classList.add('selected');
+                        }
+                        radio.addEventListener('change', function() {
+                            if (this.checked) handleSelect(q.id, opt);
+                        });
+                        label.appendChild(radio);
+                        label.append(opt);
+                        optionsDiv.appendChild(label);
+                    });
+                }
+
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                feedback.id = `fb-${q.id}`;
+                if (selections[q.id] && q.options && q.options.length > 0) {
+                    const ok = isCorrect(selections[q.id], q.answer);
+                    showFeedback(q.id, ok);
+                }
+
+                block.appendChild(title);
+                block.appendChild(optionsDiv);
+                block.appendChild(feedback);
+                container.appendChild(block);
+            });
+            updateProgress();
+        }
+
+        function handleSelect(qId, selected) {
+            selections[qId] = selected;
+            const q = allQuestions.find(q => q.id === qId);
+            const ok = isCorrect(selected, q.answer);
+            showFeedback(qId, ok);
+
+            const block = document.getElementById(`q-${qId}`);
+            block.classList.remove('unanswered', 'correct', 'wrong');
+            block.classList.add(ok ? 'correct' : 'wrong');
+
+            const labels = block.querySelectorAll('.option-label');
+            labels.forEach(label => {
+                const radio = label.querySelector('input[type="radio"]');
+                const val = radio.value;
+                label.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                if (val === selected) {
+                    label.classList.add('selected');
+                    if (ok) label.classList.add('correct-answer');
+                    else label.classList.add('wrong-answer');
+                }
+                // 高亮正确答案
+                if (q && q.options) {
+                    const full = getFullAnswer(q.options, q.answer);
+                    if (full && val === full) label.classList.add('correct-answer');
+                    if (getPrefix(val) && getPrefix(val) === q.answer) label.classList.add('correct-answer');
+                }
+            });
+            updateProgress();
+        }
+
+        function showFeedback(qId, ok) {
+            const q = allQuestions.find(q => q.id === qId);
+            const fb = document.getElementById(`fb-${qId}`);
+            if (!fb || !q || !q.options || q.options.length === 0) return;
+            fb.className = `feedback show ${ok ? 'correct' : 'wrong'}`;
+            let extra = '';
+            if (!ok) {
+                const full = getFullAnswer(q.options, q.answer);
+                extra = `<span class="correct-ans">正确答案：${full}</span>`;
+            }
+            fb.innerHTML = ok ? '✅ 回答正确！' : `❌ 回答错误。${extra}`;
+        }
+
+        function updateProgress() {
+            const list = getFiltered();
+            let total = list.length;
+            let answered = 0;
+            list.forEach(q => {
+                if (q.options && q.options.length > 0) {
+                    if (selections[q.id]) answered++;
+                } else {
+                    answered++; // 简答/论述自动计入
+                }
+            });
+            const pct = total ? (answered / total * 100) : 0;
+            progressBar.style.width = `${pct}%`;
+            progressText.textContent = `${answered} / ${total} 题`;
+
+            let correct = 0,
+                wrong = 0;
+            list.forEach(q => {
+                if (q.options && q.options.length > 0 && selections[q.id]) {
+                    if (isCorrect(selections[q.id], q.answer)) correct++;
+                    else wrong++;
+                }
+            });
+            correctCountEl.textContent = `✅ 正确 ${correct}`;
+            wrongCountEl.textContent = `❌ 错误 ${wrong}`;
+        }
+
+        function resetAll() {
+            selections = {};
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.paper;
+                selections = {};
+                render();
+            });
+        });
+
+        render();
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+        document.getElementById('scrollToTopBtn').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

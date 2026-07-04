@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>习近平新时代中国特色社会主义思想概论 · 在线答题</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f4fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.07);
+            padding: 30px 35px;
+        }
+        h1 {
+            font-size: 28px;
+            color: #0b1e33;
+            border-left: 6px solid #d4a017;
+            padding-left: 18px;
+            margin-bottom: 2px;
+        }
+        .sub {
+            color: #5a6f84;
+            font-size: 15px;
+            padding-left: 24px;
+            margin-bottom: 22px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .tabs button {
+            border: none;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            background: #e6edf6;
+            color: #1f3a5f;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tabs button.active {
+            background: #b8860b;
+            color: white;
+            box-shadow: 0 4px 10px rgba(184, 134, 11, 0.3);
+        }
+        .tabs button:hover:not(.active) {
+            background: #d3deed;
+        }
+        .progress-wrap {
+            background: #e6edf6;
+            border-radius: 40px;
+            height: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #d4a017, #e67e22);
+            border-radius: 40px;
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #1f2e41;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+        }
+        .stats span {
+            background: #f0f5fc;
+            padding: 3px 16px;
+            border-radius: 30px;
+        }
+        .stats .right {
+            color: #1a7a5e;
+        }
+        .stats .wrong {
+            color: #b1422e;
+        }
+        .question-block {
+            background: #fafdff;
+            border: 1px solid #dfe8f2;
+            border-radius: 18px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            transition: 0.15s;
+        }
+        .question-block.correct {
+            border-left: 6px solid #1f9a7a;
+            background: #f2fcf8;
+        }
+        .question-block.wrong {
+            border-left: 6px solid #d95b43;
+            background: #fdf6f2;
+        }
+        .question-block.unanswered {
+            border-left: 6px solid #c8d4e3;
+        }
+        .q-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #11212e;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .q-type {
+            display: inline-block;
+            background: #d3e0ef;
+            font-size: 11px;
+            padding: 0 12px;
+            border-radius: 30px;
+            color: #1f3a5f;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f2f7fe;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.12s;
+            border: 1.5px solid transparent;
+            font-size: 15px;
+        }
+        .option-label:hover {
+            background: #e6eefa;
+        }
+        .option-label input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #d4a017;
+            flex-shrink: 0;
+        }
+        .option-label.selected {
+            border-color: #d4a017;
+            background: #fdf5e0;
+        }
+        .option-label.correct-answer {
+            border-color: #1f9a7a;
+            background: #d5f5ec;
+        }
+        .option-label.wrong-answer {
+            border-color: #d95b43;
+            background: #fce6de;
+        }
+        .feedback {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            display: none;
+            background: #f0f5fc;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .feedback.correct {
+            background: #def5ed;
+            color: #136b56;
+        }
+        .feedback.wrong {
+            background: #fce8e0;
+            color: #9e3f2b;
+        }
+        .feedback .correct-ans {
+            font-weight: 600;
+            color: #136b56;
+        }
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 28px 0 10px;
+        }
+        .btn {
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #e2eaf4;
+            color: #1f2e41;
+        }
+        .btn-primary {
+            background: #b8860b;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #8a6508;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #b6cade;
+        }
+        .btn-outline:hover {
+            background: #eef3fa;
+        }
+        .footer-note {
+            font-size: 13px;
+            color: #758b9f;
+            text-align: center;
+            margin-top: 18px;
+            border-top: 1px solid #e4ecf5;
+            padding-top: 18px;
+        }
+        .writing-hint {
+            padding: 12px 16px;
+            background: #f0f7ff;
+            border-radius: 14px;
+            border: 1px solid #c5d9f0;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #1d3a57;
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+            .question-block {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📘 习近平新时代中国特色社会主义思想概论</h1>
+        <div class="sub">卷一 + 卷二 · 单选 · 多选 · 填空 · 判断 · 简答 · 问答</div>
+
+        <div class="tabs">
+            <button class="active" data-paper="all">📚 全部</button>
+            <button data-paper="1">📄 卷一</button>
+            <button data-paper="2">📄 卷二</button>
+        </div>
+
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="stats">
+            <span id="progressText">0 / 0 题</span>
+            <span class="right" id="correctCount">✅ 正确 0</span>
+            <span class="wrong" id="wrongCount">❌ 错误 0</span>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <div class="actions">
+            <button class="btn btn-outline" id="resetBtn">🔄 重新答题</button>
+            <button class="btn btn-primary" id="scrollToTopBtn">↑ 回到顶部</button>
+        </div>
+        <div class="footer-note">✔ 单选/多选/判断即时判对错 · 填空/简答/问答显示参考答案</div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 习近平新时代中国特色社会主义思想概论 · 全部题目
+        // ============================================================
+
+        function getPrefix(opt) {
+            const m = opt.match(/^([A-Da-d])[.、]\s*/);
+            return m ? m[1].toUpperCase() : null;
+        }
+
+        function isCorrect(selected, answer) {
+            if (!selected || !answer) return false;
+            const sp = getPrefix(selected);
+            const ap = getPrefix(answer);
+            if (sp && ap) return sp === ap;
+            if (sp) return sp === answer;
+            return selected === answer;
+        }
+
+        function getFullAnswer(options, answer) {
+            if (!options) return answer;
+            for (let o of options) {
+                if (isCorrect(o, answer)) return o;
+                if (o === answer) return o;
+            }
+            return answer;
+        }
+
+        // 多选判题
+        function isMultiCorrect(selected, answer) {
+            if (!selected || !answer) return false;
+            // 提取选中字母
+            const selLetters = selected.split(',').map(s => s.trim().charAt(0).toUpperCase()).sort().join('');
+            const ansLetters = answer.split('').map(s => s.trim().toUpperCase()).sort().join('');
+            return selLetters === ansLetters;
+        }
+
+        const allQuestions = [
+            // ==================== 卷一 ====================
+            // ---- 单选 7题 ----
+            { id: '1_s1', paper: '1', type: '单选题', question: '中国特色社会主义最本质特征', options: ['A. 人民民主专政', 'B. 人民代表大会制度', 'C. 中国共产党领导', 'D. 马克思主义指导'], answer: 'C' },
+            { id: '1_s2', paper: '1', type: '单选题', question: '中国特色社会主义战略布局', options: ['A. "五位一体"', 'B. "四个自信"', 'C. "四个全面"', 'D. "两个维护"'], answer: 'C' },
+            { id: '1_s3', paper: '1', type: '单选题', question: '新时代社会主要矛盾', options: ['A. 人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾', 'B. 人民日益增长的物质文化需要同落后的社会生产之间的矛盾', 'C. 生产力与生产关系的矛盾', 'D. 经济基础与上层建筑的矛盾'], answer: 'A' },
+            { id: '1_s4', paper: '1', type: '单选题', question: '立党为公执政为民的本质要求', options: ['A. 发展经济', 'B. 社会稳定', 'C. 为民造福', 'D. 从严治党'], answer: 'C' },
+            { id: '1_s5', paper: '1', type: '单选题', question: '第一生产力', options: ['A. 人才', 'B. 教育', 'C. 科技', 'D. 创新'], answer: 'C' },
+            { id: '1_s6', paper: '1', type: '单选题', question: '民族复兴的根基', options: ['A. 经济发展', 'B. 国家安全', 'C. 文化自信', 'D. 社会和谐'], answer: 'B' },
+            { id: '1_s7', paper: '1', type: '单选题', question: '党的统领', options: ['A. 政治建设', 'B. 思想建设', 'C. 组织建设', 'D. 作风建设'], answer: 'A' },
+
+            // ---- 多选 7题 ----
+            { id: '1_m1', paper: '1', type: '多选题', question: '创立时代背景', options: ['A. 世界百年未有之大变局加速演进', 'B. 中华民族伟大复兴关键时期', 'C. 改革开放深化期', 'D. 全面建成小康社会'], answer: 'AB' },
+            { id: '1_m2', paper: '1', type: '多选题', question: '中国式现代化中国特色', options: ['A. 人口规模巨大', 'B. 全体人民共同富裕', 'C. 物质与精神文明协调', 'D. 人与自然和谐共生', 'E. 和平发展'], answer: 'ACDE' },
+            { id: '1_m3', paper: '1', type: '多选题', question: '改革开放是', options: ['A. 决定当代中国命运的关键一招', 'B. 必由之路', 'C. 重要法宝', 'D. 必然要求', 'E. 根本目的'], answer: 'ABCD' },
+            { id: '1_m4', paper: '1', type: '多选题', question: '全面建设社会主义现代化国家', options: ['A. 教育根本', 'B. 科技关键', 'C. 人才基础', 'D. 创新驱动', 'E. 改革引领'], answer: 'ABC' },
+            { id: '1_m5', paper: '1', type: '多选题', question: '文化繁荣兴盛是', options: ['A. 民族复兴必然要求', 'B. 现代化强国应有之义', 'C. 满足美好生活需要', 'D. 在世界文化激荡中站稳脚跟', 'E. 提升国际影响力的途径'], answer: 'ABCD' },
+            { id: '1_m6', paper: '1', type: '多选题', question: '国家安全形势（外部）', options: ['A. 战略格局变迁', 'B. 全球性问题', 'C. 地区冲突', 'D. 和平发展面临挑战', 'E. 恐怖主义威胁'], answer: 'ABCD' },
+            { id: '1_m7', paper: '1', type: '多选题', question: '全人类共同价值', options: ['A. 和平', 'B. 发展', 'C. 公平', 'D. 正义', 'E. 民主', 'F. 自由'], answer: 'ABCDEF' },
+
+            // ---- 填空 7题 ----
+            { id: '1_f1', paper: '1', type: '填空题', question: '把______相结合', answer: '马克思主义基本原理同中华优秀传统文化', options: [] },
+            { id: '1_f2', paper: '1', type: '填空题', question: '中国特色社会主义制度包括______、基本制度、重要制度', answer: '根本制度', options: [] },
+            { id: '1_f3', paper: '1', type: '填空题', question: '______是党的根本政治立场', answer: '人民立场', options: [] },
+            { id: '1_f4', paper: '1', type: '填空题', question: '人才资源是______', answer: '第一资源', options: [] },
+            { id: '1_f5', paper: '1', type: '填空题', question: '______是最广泛、最真实、最管用的民主', answer: '全过程人民民主', options: [] },
+            { id: '1_f6', paper: '1', type: '填空题', question: '建设______是重要目标', answer: '美丽中国', options: [] },
+            { id: '1_f7', paper: '1', type: '填空题', question: '总体国家安全观以______为宗旨', answer: '人民安全', options: [] },
+
+            // ---- 判断 6题 ----
+            { id: '1_j1', paper: '1', type: '判断题', question: '中心任务=全面建成社会主义现代化强国、实现第一个百年目标', options: ['正确', '错误'], answer: '错误' },
+            { id: '1_j2', paper: '1', type: '判断题', question: '新发展理念是必由之路，全面从严治党是必由之路', options: ['正确', '错误'], answer: '正确' },
+            { id: '1_j3', paper: '1', type: '判断题', question: '最艰巨最繁重的任务在农村', options: ['正确', '错误'], answer: '正确' },
+            { id: '1_j4', paper: '1', type: '判断题', question: '"立善法于天下则天下治"', options: ['正确', '错误'], answer: '正确' },
+            { id: '1_j5', paper: '1', type: '判断题', question: '绿水青山可买到金山银山', options: ['正确', '错误'], answer: '错误' },
+            { id: '1_j6', paper: '1', type: '判断题', question: '一体推进不敢腐不能腐不想腐', options: ['正确', '错误'], answer: '正确' },
+
+            // ---- 简答 5题 ----
+            { id: '1_short1', paper: '1', type: '简答题', question: '中国特色社会主义的鲜明特色', answer: 'A. 人民代表大会制度；B. 多党合作和政治协商制度；C. 公有制为主体多种所有制共同发展；D. 按劳分配为主体多种分配方式并存；E. 社会主义市场经济体制', options: [] },
+            { id: '1_short2', paper: '1', type: '简答题', question: '中国共产党领导是最本质特征', answer: 'A. 近代中国历史发展中形成；B. 由最广大人民根本利益决定；C. 由民族复兴历史任务决定；D. 决定中国特色社会主义其他特征', options: [] },
+            { id: '1_short3', paper: '1', type: '简答题', question: '如何理解新发展阶段', answer: 'A. 社会主义初级阶段中的重要阶段；B. 从站起来富起来到强起来的跨越；C. 向第二个百年奋斗目标进军；D. 决胜全面小康社会阶段', options: [] },
+            { id: '1_short4', paper: '1', type: '简答题', question: '文化繁荣兴盛的重要意义', answer: 'A. 民族复兴必然要求；B. 现代化强国应有之义；C. 满足人民美好生活需要；D. 在世界文化激荡中站稳脚跟', options: [] },
+            { id: '1_short5', paper: '1', type: '简答题', question: '党执政面临"四大考验"', answer: 'A. 改革开放考验；B. 市场经济考验；C. 外部环境考验；D. 长期执政考验', options: [] },
+
+            // ---- 问答 1题 ----
+            { id: '1_essay', paper: '1', type: '问答题', question: '如何全面理解全过程人民民主？', answer: '全过程人民民主既有完整制度程序，也有完整参与实践，具有时间连续性、内容整体性、运行协同性、人民参与广泛性和持续性。①全链条：民主选举→协商→决策→管理→监督紧密贯通；②全方位：涵盖国家发展大事、社会治理难事、百姓日常琐事；③全覆盖：覆盖政治、文化、社会、生态文明各项事业；④最广泛、最真实、最管用。', options: [] },
+
+            // ==================== 卷二 ====================
+            // ---- 单选 8题 ----
+            { id: '2_s1', paper: '2', type: '单选题', question: '时代主题', options: ['A. 战争与革命', 'B. 斗争与发展', 'C. 和平与发展', 'D. 合作与共赢'], answer: 'C' },
+            { id: '2_s2', paper: '2', type: '单选题', question: '中国特色社会主义战略布局', options: ['A. "五位一体"', 'B. "四个自信"', 'C. "四个全面"', 'D. "两个维护"'], answer: 'C' },
+            { id: '2_s3', paper: '2', type: '单选题', question: '新时代社会主要矛盾', options: ['A. 人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾', 'B. 人民日益增长的物质文化需要同落后的社会生产之间的矛盾', 'C. 生产力与生产关系的矛盾', 'D. 经济基础与上层建筑的矛盾'], answer: 'A' },
+            { id: '2_s4', paper: '2', type: '单选题', question: '中国梦归根到底是', options: ['A. 国家的梦', 'B. 人民的梦', 'C. 民族的梦', 'D. 个人的梦'], answer: 'B' },
+            { id: '2_s5', paper: '2', type: '单选题', question: '决定当代中国命运的关键一招', options: ['A. 科技创新', 'B. 改革开放', 'C. 依法治国', 'D. 从严治党'], answer: 'B' },
+            { id: '2_s6', paper: '2', type: '单选题', question: '第一生产力', options: ['A. 人才', 'B. 教育', 'C. 科技', 'D. 创新'], answer: 'C' },
+            { id: '2_s7', paper: '2', type: '单选题', question: '我国国体', options: ['A. 人民民主专政', 'B. 人民代表大会制度', 'C. 多党合作和政治协商制度', 'D. 民族区域自治制度'], answer: 'A' },
+            { id: '2_s8', paper: '2', type: '单选题', question: '"天人合一"思想', options: ['A. 人与社会', 'B. 人与自然', 'C. 人与自我', 'D. 人与他人'], answer: 'B' },
+
+            // ---- 多选 7题 ----
+            { id: '2_m1', paper: '2', type: '多选题', question: '新时代中心任务', options: ['A. 全面建成社会主义现代化强国', 'B. 实现第二个百年目标', 'C. 中国式现代化推进民族复兴', 'D. 全面深化改革', 'E. 全面依法治国'], answer: 'ABC' },
+            { id: '2_m2', paper: '2', type: '多选题', question: '中国式现代化特征', options: ['A. 人口规模巨大', 'B. 全体人民共同富裕', 'C. 物质与精神文明协调', 'D. 人与自然和谐共生', 'E. 和平发展'], answer: 'ACDE' },
+            { id: '2_m3', paper: '2', type: '多选题', question: '"江山就是人民、人民就是江山"', options: ['A. 历史唯物主义真理光芒', 'B. 充分说明国体政体的人民性', 'C. 人民是生命之根执政之基力量之源', 'D. 由党的性质和宗旨决定', 'E. 人民民主专政的本质要求'], answer: 'ABCD' },
+            { id: '2_m4', paper: '2', type: '多选题', question: '新发展阶段', options: ['A. 社会主义初级阶段重要阶段', 'B. 站起来富起来到强起来', 'C. 向第二个百年进军', 'D. 决胜全面小康社会阶段', 'E. 改革开放深化阶段'], answer: 'ABC' },
+            { id: '2_m5', paper: '2', type: '多选题', question: '全面建设社会主义现代化国家', options: ['A. 教育根本', 'B. 科技关键', 'C. 人才基础', 'D. 创新驱动', 'E. 改革引领'], answer: 'ABC' },
+            { id: '2_m6', paper: '2', type: '多选题', question: '中国特色社会主义政治制度', options: ['A. 把握历史传承', 'B. 着眼现实问题', 'C. 形式内容有机统一', 'D. 中国特色民族特色时代特色', 'E. 借鉴西方政治制度'], answer: 'ABCD' },
+            { id: '2_m7', paper: '2', type: '多选题', question: '文化繁荣兴盛是', options: ['A. 民族复兴必然要求', 'B. 现代化强国应有之义', 'C. 满足美好生活需要', 'D. 在世界文化激荡中站稳脚跟', 'E. 提升国际影响力的途径'], answer: 'ABCD' },
+
+            // ---- 填空 7题 ----
+            { id: '2_f1', paper: '2', type: '填空题', question: '党的基本路线是国家的______、人民的______', answer: '生命线；幸福线', options: [] },
+            { id: '2_f2', paper: '2', type: '填空题', question: '中国梦=______、______、人民幸福', answer: '国家富强；民族振兴', options: [] },
+            { id: '2_f3', paper: '2', type: '填空题', question: '______是党的根本政治立场', answer: '人民立场', options: [] },
+            { id: '2_f4', paper: '2', type: '填空题', question: '公有制经济和______都是重要基础', answer: '非公有制经济', options: [] },
+            { id: '2_f5', paper: '2', type: '填空题', question: '全面依法治国走______道路', answer: '中国特色社会主义法治', options: [] },
+            { id: '2_f6', paper: '2', type: '填空题', question: '建设______是重要目标', answer: '美丽中国', options: [] },
+            { id: '2_f7', paper: '2', type: '填空题', question: '总体国家安全观以______为宗旨', answer: '人民安全', options: [] },
+
+            // ---- 判断 6题 ----
+            { id: '2_j1', paper: '2', type: '判断题', question: '独立自主是立党立国重要原则', options: ['正确', '错误'], answer: '正确' },
+            { id: '2_j2', paper: '2', type: '判断题', question: '中国共产党根基在人民血脉在人民力量在人民', options: ['正确', '错误'], answer: '正确' },
+            { id: '2_j3', paper: '2', type: '判断题', question: '中国对外开放不是独角戏', options: ['正确', '错误'], answer: '正确' },
+            { id: '2_j4', paper: '2', type: '判断题', question: '科技创新是百年变局关键变量', options: ['正确', '错误'], answer: '正确' },
+            { id: '2_j5', paper: '2', type: '判断题', question: '人民民主是社会主义的生命', options: ['正确', '错误'], answer: '正确' },
+            { id: '2_j6', paper: '2', type: '判断题', question: '新时代强军目标', options: ['正确', '错误'], answer: '正确' },
+
+            // ---- 简答 5题 ----
+            { id: '2_short1', paper: '2', type: '简答题', question: '中国式现代化的中国特色', answer: 'A. 人口规模巨大；B. 全体人民共同富裕；C. 物质与精神文明协调；D. 人与自然和谐共生；E. 走和平发展道路', options: [] },
+            { id: '2_short2', paper: '2', type: '简答题', question: '理解"江山就是人民、人民就是江山"', answer: 'A. 闪耀历史唯物主义真理光芒；B. 充分说明国体政体的人民性；C. 人民是生命之根执政之基力量之源；D. 由党的性质和宗旨决定', options: [] },
+            { id: '2_short3', paper: '2', type: '简答题', question: '如何理解新发展阶段', answer: 'A. 社会主义初级阶段重要阶段；B. 从站起来富起来到强起来；C. 向第二个百年目标进军；D. 决胜全面小康社会阶段', options: [] },
+            { id: '2_short4', paper: '2', type: '简答题', question: '如何理解全面依法治国', answer: 'A. 国家治理深刻革命；B. 完善中国特色社会主义制度的重要方面；C. 坚持和发展中国特色社会主义的本质要求和重要保障；D. "四个全面"战略布局之一', options: [] },
+            { id: '2_short5', paper: '2', type: '简答题', question: '如何理解增进民生福祉', answer: 'A. 立党为公执政为民的本质要求；B. 社会主义生产根本目的；C. 全面建设社会主义现代化国家的应有之义；D. 社会主义和资本主义的根本区别之一', options: [] },
+
+            // ---- 问答 1题 ----
+            { id: '2_essay', paper: '2', type: '问答题', question: '怎样增强人民获得感、幸福感、安全感？', answer: '①抓住人民最关心最直接最现实的利益问题，在幼有所育、学有所教、劳有所得、病有所医、老有所养、住有所居、弱有所扶上持续用力；②把人民群众小事当大事，从关心的事做起，从满意的事做起；③民生改善从低层次到高层次、从不均衡到均衡；④根据经济发展和财力状况逐步提高，做现实条件下可以做到的事。', options: [] }
+        ];
+
+        // ============================================================
+        const container = document.getElementById('questionsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const correctCountEl = document.getElementById('correctCount');
+        const wrongCountEl = document.getElementById('wrongCount');
+
+        let currentFilter = 'all';
+        let selections = {};
+
+        function getFiltered() {
+            if (currentFilter === 'all') return allQuestions;
+            return allQuestions.filter(q => q.paper === currentFilter);
+        }
+
+        function render() {
+            const list = getFiltered();
+            container.innerHTML = '';
+            list.forEach((q, idx) => {
+                const block = document.createElement('div');
+                block.className = 'question-block unanswered';
+                block.id = `q-${q.id}`;
+
+                const title = document.createElement('div');
+                title.className = 'q-title';
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'q-type';
+                typeSpan.textContent = q.type;
+                title.appendChild(typeSpan);
+                title.innerHTML += ` ${idx+1}. ${q.question}`;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                if (!q.options || q.options.length === 0) {
+                    const note = document.createElement('div');
+                    note.className = 'writing-hint';
+                    note.innerHTML = `<strong>📖 参考答案：</strong>${q.answer}`;
+                    optionsDiv.appendChild(note);
+                    block.classList.remove('unanswered');
+                    block.classList.add('correct');
+                } else {
+                    // 多选题用 checkbox
+                    const isMulti = q.type === '多选题';
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'option-label';
+                        const input = document.createElement('input');
+                        input.type = isMulti ? 'checkbox' : 'radio';
+                        input.name = q.id;
+                        input.value = opt;
+                        if (selections[q.id] && selections[q.id].includes(opt)) {
+                            input.checked = true;
+                            label.classList.add('selected');
+                        }
+                        input.addEventListener('change', function() {
+                            if (isMulti) {
+                                if (!selections[q.id]) selections[q.id] = [];
+                                if (this.checked) {
+                                    if (!selections[q.id].includes(opt)) selections[q.id].push(opt);
+                                } else {
+                                    selections[q.id] = selections[q.id].filter(s => s !== opt);
+                                }
+                                if (selections[q.id].length === 0) delete selections[q.id];
+                                handleMultiSelect(q.id);
+                            } else {
+                                if (this.checked) handleSelect(q.id, opt);
+                            }
+                        });
+                        label.appendChild(input);
+                        label.append(opt);
+                        optionsDiv.appendChild(label);
+                    });
+                }
+
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                feedback.id = `fb-${q.id}`;
+                if (selections[q.id] && q.options && q.options.length > 0) {
+                    const ok = q.type === '多选题' ?
+                        isMultiCorrect(selections[q.id].join(','), q.answer) :
+                        isCorrect(selections[q.id], q.answer);
+                    showFeedback(q.id, ok);
+                }
+
+                block.appendChild(title);
+                block.appendChild(optionsDiv);
+                block.appendChild(feedback);
+                container.appendChild(block);
+            });
+            updateProgress();
+        }
+
+        function handleSelect(qId, selected) {
+            selections[qId] = selected;
+            const q = allQuestions.find(q => q.id === qId);
+            const ok = isCorrect(selected, q.answer);
+            showFeedback(qId, ok);
+            updateBlockStyle(qId, ok);
+            updateProgress();
+        }
+
+        function handleMultiSelect(qId) {
+            const q = allQuestions.find(q => q.id === qId);
+            const sel = selections[qId] || [];
+            const ok = isMultiCorrect(sel.join(','), q.answer);
+            showFeedback(qId, ok);
+            updateBlockStyle(qId, ok);
+            updateProgress();
+        }
+
+        function updateBlockStyle(qId, ok) {
+            const block = document.getElementById(`q-${qId}`);
+            block.classList.remove('unanswered', 'correct', 'wrong');
+            block.classList.add(ok ? 'correct' : 'wrong');
+            const labels = block.querySelectorAll('.option-label');
+            const q = allQuestions.find(q => q.id === qId);
+            labels.forEach(label => {
+                const input = label.querySelector('input');
+                const val = input.value;
+                label.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                if (input.checked) label.classList.add('selected');
+                if (q && q.options) {
+                    const full = getFullAnswer(q.options, q.answer);
+                    if (full && val === full) label.classList.add('correct-answer');
+                    if (getPrefix(val) && getPrefix(val) === q.answer) label.classList.add('correct-answer');
+                }
+            });
+        }
+
+        function showFeedback(qId, ok) {
+            const q = allQuestions.find(q => q.id === qId);
+            const fb = document.getElementById(`fb-${qId}`);
+            if (!fb || !q || !q.options || q.options.length === 0) return;
+            fb.className = `feedback show ${ok ? 'correct' : 'wrong'}`;
+            let extra = '';
+            if (!ok) {
+                const full = getFullAnswer(q.options, q.answer);
+                extra = `<span class="correct-ans">正确答案：${full}</span>`;
+            }
+            fb.innerHTML = ok ? '✅ 回答正确！' : `❌ 回答错误。${extra}`;
+        }
+
+        function updateProgress() {
+            const list = getFiltered();
+            let total = list.length;
+            let answered = 0;
+            list.forEach(q => {
+                if (q.options && q.options.length > 0) {
+                    if (selections[q.id] && (Array.isArray(selections[q.id]) ? selections[q.id].length > 0 : true)) answered++;
+                } else {
+                    answered++;
+                }
+            });
+            const pct = total ? (answered / total * 100) : 0;
+            progressBar.style.width = `${pct}%`;
+            progressText.textContent = `${answered} / ${total} 题`;
+
+            let correct = 0,
+                wrong = 0;
+            list.forEach(q => {
+                if (q.options && q.options.length > 0 && selections[q.id]) {
+                    const ok = q.type === '多选题' ?
+                        isMultiCorrect(selections[q.id].join(','), q.answer) :
+                        isCorrect(selections[q.id], q.answer);
+                    if (ok) correct++;
+                    else wrong++;
+                }
+            });
+            correctCountEl.textContent = `✅ 正确 ${correct}`;
+            wrongCountEl.textContent = `❌ 错误 ${wrong}`;
+        }
+
+        function resetAll() {
+            selections = {};
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(r => r.checked = false);
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.paper;
+                selections = {};
+                render();
+            });
+        });
+
+        render();
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+        document.getElementById('scrollToTopBtn').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
