@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>马克思主义基本原理 · 在线答题</title>
+    <title>马克思主义基本原理 · 在线答题（多选题已修复）</title>
     <style>
         * {
             box-sizing: border-box;
@@ -154,7 +154,8 @@
         .option-label:hover {
             background: #e6eefa;
         }
-        .option-label input[type="radio"] {
+        .option-label input[type="radio"],
+        .option-label input[type="checkbox"] {
             width: 18px;
             height: 18px;
             accent-color: #c0392b;
@@ -257,7 +258,7 @@
 <body>
     <div class="container">
         <h1>📕 马克思主义基本原理</h1>
-        <div class="sub">A 卷 + B 卷 · 单选 · 多选 · 简答 · 论述</div>
+        <div class="sub">A 卷 + B 卷 · 单选 · 多选（已修复）· 简答 · 论述</div>
 
         <div class="tabs">
             <button class="active" data-paper="all">📚 全部</button>
@@ -283,31 +284,57 @@
 
     <script>
         // ============================================================
-        // 马克思主义基本原理 · 全部题目
+        // 马克思主义基本原理 · 全部题目（多选题已修复）
         // ============================================================
 
         // ----- 工具函数 -----
         function getPrefix(opt) {
-            const m = opt.match(/^([A-Da-d])[.、]\s*/);
+            const m = opt.match(/^([A-Ea-e])[.、]\s*/);
             return m ? m[1].toUpperCase() : null;
         }
 
-        function isCorrect(selected, answer) {
+        // 单选题判题
+        function isSingleCorrect(selected, answer) {
             if (!selected || !answer) return false;
-            const selPrefix = getPrefix(selected);
-            const ansPrefix = getPrefix(answer);
-            if (selPrefix && ansPrefix) return selPrefix === ansPrefix;
-            if (selPrefix) return selPrefix === answer;
+            const sp = getPrefix(selected);
+            const ap = getPrefix(answer);
+            if (sp && ap) return sp === ap;
+            if (sp) return sp === answer;
             return selected === answer;
         }
 
+        // 多选题判题：选中的字母集合 === 正确答案字母集合
+        function isMultiCorrect(selectedArray, answer) {
+            if (!selectedArray || selectedArray.length === 0 || !answer) return false;
+            // 提取每个选项的字母前缀
+            const selLetters = selectedArray.map(s => getPrefix(s) || s.trim().charAt(0).toUpperCase()).sort().join('');
+            const ansLetters = answer.split('').map(s => s.trim().toUpperCase()).sort().join('');
+            return selLetters === ansLetters;
+        }
+
+        // 获取完整答案文本
         function getFullAnswer(options, answer) {
             if (!options) return answer;
             for (let o of options) {
-                if (isCorrect(o, answer)) return o;
+                const p = getPrefix(o);
+                if (p && p === answer) return o;
                 if (o === answer) return o;
             }
             return answer;
+        }
+
+        // 多选：获取所有正确答案的完整文本
+        function getFullMultiAnswer(options, answer) {
+            if (!options) return answer;
+            const ansLetters = answer.split('').map(s => s.trim().toUpperCase());
+            const result = [];
+            for (let o of options) {
+                const p = getPrefix(o);
+                if (p && ansLetters.includes(p)) {
+                    result.push(o);
+                }
+            }
+            return result.length > 0 ? result.join('；') : answer;
         }
 
         const allQuestions = [
@@ -324,7 +351,7 @@
             { id: 'A_s9', paper: 'A', type: '单选题', question: '生产关系中起决定作用', options: ['A. 生产资料所有制', 'B. 产品分配方式', 'C. 生产中人与人的关系', 'D. 生产力水平'], answer: 'A' },
             { id: 'A_s10', paper: 'A', type: '单选题', question: '共产主义的含义', options: ['A. 一种社会制度', 'B. 一种意识形态', 'C. 一种理想', 'D. 以建立共产主义为目标的实际运动'], answer: 'D' },
 
-            // ---- 多选 10题 ----
+            // ---- 多选 10题（正确答案为字母组合，如 "ABDE"）----
             { id: 'A_m1', paper: 'A', type: '多选题', question: '马克思主义是', options: ['A. 关于社会主义代替资本主义的学说', 'B. 指导思想', 'C. 关于人的解放的学说', 'D. 关于一般规律的学说', 'E. 关于阶级斗争的学说'], answer: 'ABDE' },
             { id: 'A_m2', paper: 'A', type: '多选题', question: '实践对认识的决定作用', options: ['A. 来源', 'B. 发展动力', 'C. 检验标准', 'D. 目的', 'E. 唯一途径'], answer: 'ABCD' },
             { id: 'A_m3', paper: 'A', type: '多选题', question: '国家垄断资本主义形式', options: ['A. 国家直接经营企业', 'B. 参与私人资本再生产', 'C. 法律规范', 'D. 宏观调节', 'E. 国家与私人合营'], answer: 'ABCDE' },
@@ -388,11 +415,32 @@
         const wrongCountEl = document.getElementById('wrongCount');
 
         let currentFilter = 'all';
-        let selections = {};
+        let selections = {}; // 单选存字符串，多选存数组
 
         function getFiltered() {
             if (currentFilter === 'all') return allQuestions;
             return allQuestions.filter(q => q.paper === currentFilter);
+        }
+
+        // 判断某题是否已回答
+        function isAnswered(q) {
+            if (!q.options || q.options.length === 0) return true; // 简答/论述自动算已答
+            const sel = selections[q.id];
+            if (q.type === '多选题') {
+                return sel && Array.isArray(sel) && sel.length > 0;
+            }
+            return !!sel;
+        }
+
+        // 判断某题是否正确
+        function isQuestionCorrect(q) {
+            if (!q.options || q.options.length === 0) return true;
+            const sel = selections[q.id];
+            if (!sel) return false;
+            if (q.type === '多选题') {
+                return isMultiCorrect(sel, q.answer);
+            }
+            return isSingleCorrect(sel, q.answer);
         }
 
         function render() {
@@ -423,21 +471,45 @@
                     block.classList.remove('unanswered');
                     block.classList.add('correct');
                 } else {
+                    const isMulti = q.type === '多选题';
                     q.options.forEach(opt => {
                         const label = document.createElement('label');
                         label.className = 'option-label';
-                        const radio = document.createElement('input');
-                        radio.type = 'radio';
-                        radio.name = q.id;
-                        radio.value = opt;
-                        if (selections[q.id] === opt) {
-                            radio.checked = true;
-                            label.classList.add('selected');
+                        const input = document.createElement('input');
+                        input.type = isMulti ? 'checkbox' : 'radio';
+                        input.name = q.id;
+                        input.value = opt;
+                        // 恢复选择
+                        const sel = selections[q.id];
+                        if (sel) {
+                            if (isMulti && Array.isArray(sel) && sel.includes(opt)) {
+                                input.checked = true;
+                                label.classList.add('selected');
+                            } else if (!isMulti && sel === opt) {
+                                input.checked = true;
+                                label.classList.add('selected');
+                            }
                         }
-                        radio.addEventListener('change', function() {
-                            if (this.checked) handleSelect(q.id, opt);
+                        input.addEventListener('change', function() {
+                            if (isMulti) {
+                                if (!selections[q.id] || !Array.isArray(selections[q.id])) {
+                                    selections[q.id] = [];
+                                }
+                                if (this.checked) {
+                                    if (!selections[q.id].includes(opt)) selections[q.id].push(opt);
+                                } else {
+                                    selections[q.id] = selections[q.id].filter(s => s !== opt);
+                                }
+                                if (selections[q.id].length === 0) delete selections[q.id];
+                                updateQuestionState(q.id);
+                            } else {
+                                if (this.checked) {
+                                    selections[q.id] = opt;
+                                    updateQuestionState(q.id);
+                                }
+                            }
                         });
-                        label.appendChild(radio);
+                        label.appendChild(input);
                         label.append(opt);
                         optionsDiv.appendChild(label);
                     });
@@ -446,8 +518,8 @@
                 const feedback = document.createElement('div');
                 feedback.className = 'feedback';
                 feedback.id = `fb-${q.id}`;
-                if (selections[q.id] && q.options && q.options.length > 0) {
-                    const ok = isCorrect(selections[q.id], q.answer);
+                if (isAnswered(q) && q.options && q.options.length > 0) {
+                    const ok = isQuestionCorrect(q);
                     showFeedback(q.id, ok);
                 }
 
@@ -459,31 +531,38 @@
             updateProgress();
         }
 
-        function handleSelect(qId, selected) {
-            selections[qId] = selected;
+        function updateQuestionState(qId) {
             const q = allQuestions.find(q => q.id === qId);
-            const ok = isCorrect(selected, q.answer);
+            if (!q) return;
+            const ok = isQuestionCorrect(q);
             showFeedback(qId, ok);
 
             const block = document.getElementById(`q-${qId}`);
             block.classList.remove('unanswered', 'correct', 'wrong');
             block.classList.add(ok ? 'correct' : 'wrong');
 
+            // 高亮选项
             const labels = block.querySelectorAll('.option-label');
+            const isMulti = q.type === '多选题';
+            const sel = selections[q.id];
             labels.forEach(label => {
-                const radio = label.querySelector('input[type="radio"]');
-                const val = radio.value;
+                const input = label.querySelector('input');
+                const val = input.value;
                 label.classList.remove('selected', 'correct-answer', 'wrong-answer');
-                if (val === selected) {
-                    label.classList.add('selected');
-                    if (ok) label.classList.add('correct-answer');
-                    else label.classList.add('wrong-answer');
-                }
+                if (input.checked) label.classList.add('selected');
                 // 高亮正确答案
-                if (q && q.options) {
-                    const full = getFullAnswer(q.options, q.answer);
-                    if (full && val === full) label.classList.add('correct-answer');
-                    if (getPrefix(val) && getPrefix(val) === q.answer) label.classList.add('correct-answer');
+                if (q.options) {
+                    if (isMulti) {
+                        const ansLetters = q.answer.split('').map(s => s.trim().toUpperCase());
+                        const p = getPrefix(val);
+                        if (p && ansLetters.includes(p)) {
+                            label.classList.add('correct-answer');
+                        }
+                    } else {
+                        const full = getFullAnswer(q.options, q.answer);
+                        if (full && val === full) label.classList.add('correct-answer');
+                        if (getPrefix(val) && getPrefix(val) === q.answer) label.classList.add('correct-answer');
+                    }
                 }
             });
             updateProgress();
@@ -496,8 +575,13 @@
             fb.className = `feedback show ${ok ? 'correct' : 'wrong'}`;
             let extra = '';
             if (!ok) {
-                const full = getFullAnswer(q.options, q.answer);
-                extra = `<span class="correct-ans">正确答案：${full}</span>`;
+                if (q.type === '多选题') {
+                    const full = getFullMultiAnswer(q.options, q.answer);
+                    extra = `<span class="correct-ans">正确答案：${full}</span>`;
+                } else {
+                    const full = getFullAnswer(q.options, q.answer);
+                    extra = `<span class="correct-ans">正确答案：${full}</span>`;
+                }
             }
             fb.innerHTML = ok ? '✅ 回答正确！' : `❌ 回答错误。${extra}`;
         }
@@ -507,11 +591,7 @@
             let total = list.length;
             let answered = 0;
             list.forEach(q => {
-                if (q.options && q.options.length > 0) {
-                    if (selections[q.id]) answered++;
-                } else {
-                    answered++; // 简答/论述自动计入
-                }
+                if (isAnswered(q)) answered++;
             });
             const pct = total ? (answered / total * 100) : 0;
             progressBar.style.width = `${pct}%`;
@@ -520,8 +600,8 @@
             let correct = 0,
                 wrong = 0;
             list.forEach(q => {
-                if (q.options && q.options.length > 0 && selections[q.id]) {
-                    if (isCorrect(selections[q.id], q.answer)) correct++;
+                if (q.options && q.options.length > 0 && isAnswered(q)) {
+                    if (isQuestionCorrect(q)) correct++;
                     else wrong++;
                 }
             });
@@ -531,7 +611,7 @@
 
         function resetAll() {
             selections = {};
-            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(r => r.checked = false);
             render();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
