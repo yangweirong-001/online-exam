@@ -21,18 +21,61 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             padding: 30px 35px;
         }
-        h1 {
-            font-size: 26px;
-            color: #1a2634;
-            border-left: 5px solid #2b7be4;
-            padding-left: 16px;
-            margin-bottom: 6px;
+        /* ===== 顶部导航栏 ===== */
+        .top-nav {
+            background: #0b1e33;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-radius: 18px 18px 0 0;
+            margin: -30px -35px 22px -35px;
+        }
+        .top-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 17px;
+            background: rgba(255,255,255,0.12);
+            padding: 6px 18px;
+            border-radius: 40px;
+            transition: 0.2s;
+        }
+        .top-nav a:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .top-nav .nav-title {
+            color: #fff;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .top-nav .nav-badge {
+            color: #ffd700;
+            font-size: 14px;
+            background: rgba(255,215,0,0.15);
+            padding: 4px 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .top-nav .nav-badge span {
+            color: #fff;
+        }
+        @media (max-width: 640px) {
+            .top-nav {
+                margin: -16px -16px 16px -16px;
+                padding: 12px 16px;
+                border-radius: 18px 18px 0 0;
+            }
+            .top-nav .nav-title { font-size: 15px; }
+            .top-nav a { font-size: 14px; padding: 4px 12px; }
+            .container { padding: 16px; }
         }
         .sub {
             color: #6b7a8a;
             font-size: 14px;
             margin-bottom: 24px;
-            padding-left: 21px;
         }
         .progress-wrap {
             background: #e9eef3;
@@ -163,6 +206,14 @@
             border-top: 1px solid #e9eff5;
             padding-top: 18px;
         }
+        .writing-hint {
+            padding: 12px 16px;
+            background: #f0f7ff;
+            border-radius: 14px;
+            border: 1px solid #c5d9f0;
+            font-size: 14px;
+            color: #1d3a57;
+        }
         @media (max-width: 640px) {
             .container { padding: 16px; }
             .question-block { padding: 16px; }
@@ -172,10 +223,15 @@
 <body>
 
 <div class="container" id="app">
-    <h1>📘 经济学 · 试题汇编</h1>
+    <!-- ===== 顶部导航栏 ===== -->
+    <div class="top-nav">
+        <a href="https://yangweirong-001.github.io/online-exam/">🏠 返回首页</a>
+        <span class="nav-title">📘 经济学</span>
+        <span class="nav-badge">📊 进度 <span id="navProgress">0%</span></span>
+    </div>
+
     <div class="sub">名词解释 · 单选 · 判断 · 简答 · 计算 · 分析（含参考答案）</div>
 
-    <!-- 进度条 -->
     <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
     <div class="stats">
         <span id="progressText">0 / 0 题</span>
@@ -183,7 +239,6 @@
         <span class="wrong" id="wrongCount">❌ 错误 0</span>
     </div>
 
-    <!-- 题目容器 -->
     <div id="questionsContainer"></div>
 
     <div class="actions">
@@ -195,16 +250,13 @@
 
 <script>
     // ============================================================
-    // 经济学 · 全部题目（名词解释/单选/判断/简答/计算/分析）
+    // 经济学 · 全部题目
     // ============================================================
     const questions = [
-        // ---------- 名词解释 (4题) ----------
         { id: 'n1', type: '名词解释', question: '需求', answer: '消费者（家庭）在某一特定时期内，在每一个价格水平下愿意并且能够购买的某种商品的数量。简单地说，需求就是有支付能力的购买欲望。', options: [] },
         { id: 'n2', type: '名词解释', question: '机会成本', answer: '对于生产者来说，如果一种生产要素被用于某一特定用途，便意味着他放弃了将这项要素用于其他活动中所能获得的收益，所放弃的收益中最大的收益就是这一特定用途的机会成本。', options: [] },
         { id: 'n3', type: '名词解释', question: '外汇', answer: '外币或外币表示的用于国际结算的支付凭证。', options: [] },
         { id: 'n4', type: '名词解释', question: '通货膨胀', answer: '通货膨胀是一定时期内物价水平全面而持续的上涨。', options: [] },
-
-        // ---------- 单选题 (10题) ----------
         { id: 's1', type: '单选题', question: '微观经济学主要研究', options: ['A. 整个国民经济', 'B. 政府财政政策', 'C. 国际贸易', 'D. 家庭和企业的经济行为'], answer: 'D' },
         { id: 's2', type: '单选题', question: '扶持农产品的支持价格措施', options: ['A. 限制农产品进口', 'B. 补贴消费者', 'C. 收购过剩的农产品', 'D. 提高农业税'], answer: 'C' },
         { id: 's3', type: '单选题', question: '容易被替代的产品需求弹性', options: ['A. 小', 'B. 大', 'C. 无弹性', 'D. 单位弹性'], answer: 'B' },
@@ -215,8 +267,6 @@
         { id: 's8', type: '单选题', question: '长期的含义', options: ['A. 一年以上', 'B. 五年以上', 'C. 至少一种生产要素固定', 'D. 全部生产要素都可随产量调整的时期'], answer: 'D' },
         { id: 's9', type: '单选题', question: '世界上多数国家采用汇率标价方法', options: ['A. 直接标价', 'B. 间接标价', 'C. 美元标价', 'D. 欧元标价'], answer: 'A' },
         { id: 's10', type: '单选题', question: '一国领土所产最终产品市场价值总和', options: ['A. 国民生产总值（GNP）', 'B. 国内生产总值（GDP）', 'C. 国民收入（NI）', 'D. 个人可支配收入'], answer: 'B' },
-
-        // ---------- 判断题 (10题) ----------
         { id: 'j1', type: '判断题', question: '宏观经济学解决资源利用问题', options: ['正确', '错误'], answer: '正确' },
         { id: 'j2', type: '判断题', question: '需求价格弹性<1时降价使总收益增加', options: ['正确', '错误'], answer: '错误' },
         { id: 'j3', type: '判断题', question: '所有商品需求曲线向右下方倾斜', options: ['正确', '错误'], answer: '正确' },
@@ -227,19 +277,13 @@
         { id: 'j8', type: '判断题', question: '垄断竞争=产品无差别', options: ['正确', '错误'], answer: '错误' },
         { id: 'j9', type: '判断题', question: '外汇供求影响汇率是直接因素', options: ['正确', '错误'], answer: '正确' },
         { id: 'j10', type: '判断题', question: '应对需求拉动型通胀应增税抑消费', options: ['正确', '错误'], answer: '正确' },
-
-        // ---------- 简答题 (5题) ----------
         { id: 'm1', type: '简答题', question: '无差异曲线及其特征', answer: '无差异曲线表示两种商品不同数量组合给消费者带来相同效用的曲线。特征：①向右下方倾斜；②离原点越远满足程度越高；③任何两条不相交；④通常凸向原点。', options: [] },
         { id: 'm2', type: '简答题', question: '弹性理论对厂商决策的帮助', answer: '①弹性高的产品可适当降价增加收入（薄利多销）；②弹性低的产品可适当提价增加收入；③可根据消费者对价格敏感程度进行市场细分。', options: [] },
         { id: 'm3', type: '简答题', question: 'GDP三种核算方法', answer: '①生产法：GDP = 总产出 − 中间投入；②收入法：GDP = 工资+利息+利润+租金+间接税+折旧+非公司企业主收入；③支出法：GDP = 消费+投资+政府购买+净出口。', options: [] },
         { id: 'm4', type: '简答题', question: '经济发展与经济增长的关系', answer: '经济增长是"量"的概念（产出持续增加）；经济发展是"质"的概念（含结构转换、工业化、现代化、福利改善等）。增长是发展的基础，发展是增长的深化。', options: [] },
         { id: 'm5', type: '简答题', question: '外部性失灵及解决方法', answer: '外部性失灵指因外部性存在导致市场无法实现资源最优配置。解决方法：①庇古税；②政府管制；③外部效应内部化；④产权明晰化。', options: [] },
-
-        // ---------- 计算题 (2题) ----------
         { id: 'c1', type: '计算题', question: '已知需求 P = 100 − 4Q，供给 P = 40 + 2Q，求均衡价格与均衡产量。', answer: '均衡产量 Q = 10，均衡价格 P = 60', options: [] },
         { id: 'c2', type: '计算题', question: 'GDP核算：2019年名义GDP=1700元，2020年名义GDP=2300元。以2019为基期，求2019和2020年实际GDP。', answer: '2019年实际GDP = 1700元；2020年实际GDP = 1750元', options: [] },
-
-        // ---------- 分析题 (1题) ----------
         { id: 'a1', type: '分析题', question: '委内瑞拉恶性通货膨胀分析——请简述其成因与治理措施。', answer: '成因：①需求拉动型；②成本推动型；③混合型；④结构型。治理措施：紧缩性货币政策（降低货币供应量增长率/提高利率/公开市场出售政府债券）；紧缩性财政政策（增加税收/削减政府支出/减少转移支付和社会福利）。', options: [] }
     ];
 
@@ -252,10 +296,34 @@
     const correctCountEl = document.getElementById('correctCount');
     const wrongCountEl = document.getElementById('wrongCount');
 
-    // 存储用户选择答案 (key: questionId, value: 选择的字符串)
     let userAnswers = {};
-    // 记录哪些题已显示反馈 (用于重新渲染后恢复)
     let answeredIds = new Set();
+
+    function getPrefix(opt) {
+        const m = opt.match(/^([A-Da-d])[.、]\s*/);
+        return m ? m[1].toUpperCase() : null;
+    }
+
+    function checkAnswer(qId, selected) {
+        const q = questions.find(q => q.id === qId);
+        if (!q || !q.answer) return false;
+        if (q.type === '判断题') return selected === q.answer;
+        if (q.type === '单选题') {
+            const sp = getPrefix(selected);
+            if (sp) return sp === q.answer;
+            return selected === q.answer;
+        }
+        return true;
+    }
+
+    function getFullAnswer(q) {
+        if (!q.options || q.options.length === 0) return q.answer;
+        for (let o of q.options) {
+            if (getPrefix(o) === q.answer) return o;
+            if (o === q.answer) return o;
+        }
+        return q.answer;
+    }
 
     function renderQuestions() {
         container.innerHTML = '';
@@ -275,23 +343,20 @@
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'options';
 
-            // 判断题特殊处理：选项显示 "正确" / "错误"
             let optLabels = q.options;
             if (q.type === '判断题' && q.options.length === 0) {
                 optLabels = ['正确', '错误'];
-            } else if (q.options.length === 0 && q.type !== '判断题') {
-                // 名词解释/简答/计算/分析 没有选项，直接显示“参考答案”
+            }
+
+            if (!optLabels || optLabels.length === 0) {
                 const note = document.createElement('div');
-                note.style.cssText = 'padding: 10px 0; color: #3d5a73; background: #ecf6f0; border-radius: 12px; padding: 12px 16px; margin-top: 6px;';
+                note.className = 'writing-hint';
                 note.innerHTML = `<strong>📌 参考答案：</strong> ${q.answer}`;
                 optionsDiv.appendChild(note);
-                // 这类题直接标记为“已答”，不参与选择
                 block.classList.remove('unanswered');
                 block.classList.add('correct');
                 answeredIds.add(q.id);
-                // 不添加选项
             } else {
-                // 有选项
                 optLabels.forEach(opt => {
                     const label = document.createElement('label');
                     label.className = 'option-label';
@@ -299,7 +364,6 @@
                     radio.type = 'radio';
                     radio.name = q.id;
                     radio.value = opt;
-                    // 恢复之前的选择
                     if (userAnswers[q.id] === opt) {
                         radio.checked = true;
                         label.classList.add('selected');
@@ -315,12 +379,10 @@
                 });
             }
 
-            // 反馈区
             const feedback = document.createElement('div');
             feedback.className = 'feedback';
             feedback.id = `fb-${q.id}`;
-            // 如果已答且有选择，显示反馈
-            if (userAnswers[q.id]) {
+            if (userAnswers[q.id] && q.options && q.options.length > 0) {
                 const isCorrect = checkAnswer(q.id, userAnswers[q.id]);
                 showFeedback(q.id, isCorrect);
             }
@@ -336,19 +398,16 @@
     function handleSelect(qId, selected) {
         userAnswers[qId] = selected;
         const isCorrect = checkAnswer(qId, selected);
-        // 更新UI
         showFeedback(qId, isCorrect);
-        // 更新样式
+
         const block = document.getElementById(`q-${qId}`);
         block.classList.remove('unanswered', 'correct', 'wrong');
         block.classList.add(isCorrect ? 'correct' : 'wrong');
 
-        // 更新选项高亮
         const labels = block.querySelectorAll('.option-label');
+        const q = questions.find(q => q.id === qId);
         labels.forEach(label => {
             const radio = label.querySelector('input[type="radio"]');
-            const optText = label.textContent.trim();
-            // 注意：radio的value可能包含字母+点，需匹配
             const val = radio.value;
             label.classList.remove('selected', 'correct-answer', 'wrong-answer');
             if (val === selected) {
@@ -356,107 +415,73 @@
                 if (isCorrect) label.classList.add('correct-answer');
                 else label.classList.add('wrong-answer');
             }
-            // 如果是单选题且正确选项，高亮
-            const q = questions.find(q => q.id === qId);
-            if (q && q.type === '单选题') {
-                const correctOpt = q.answer; // 如 'D'
-                // 找到对应选项文本
-                const correctFull = q.options.find(o => o.startsWith(correctOpt+'.') || o.startsWith(correctOpt+'、'));
-                if (correctFull && val === correctFull) {
-                    label.classList.add('correct-answer');
-                }
+            if (q) {
+                const full = getFullAnswer(q);
+                if (full && val === full) label.classList.add('correct-answer');
+                if (getPrefix(val) && getPrefix(val) === q.answer) label.classList.add('correct-answer');
             }
         });
-
         answeredIds.add(qId);
         updateProgress();
-    }
-
-    function checkAnswer(qId, selected) {
-        const q = questions.find(q => q.id === qId);
-        if (!q) return false;
-        // 判断题
-        if (q.type === '判断题') {
-            return selected === q.answer;
-        }
-        // 单选题
-        if (q.type === '单选题') {
-            // 选项格式 "A. xxx" 或 "A、xxx"，提取前缀
-            const prefix = selected.charAt(0);
-            return prefix === q.answer;
-        }
-        // 其他类型（名词解释/简答/计算/分析）显示参考答案，不判对错
-        return true;
     }
 
     function showFeedback(qId, isCorrect) {
         const q = questions.find(q => q.id === qId);
         const fb = document.getElementById(`fb-${qId}`);
         if (!fb) return;
-        // 名词解释/简答/计算/分析 直接显示参考答案
-        if (['名词解释','简答','计算题','分析题'].includes(q.type)) {
-            fb.className = 'feedback show correct';
-            fb.innerHTML = `<strong>📖 参考答案：</strong> ${q.answer}`;
-            return;
-        }
-        // 单选/判断
+        if (q && (!q.options || q.options.length === 0)) return;
         fb.className = `feedback show ${isCorrect ? 'correct' : 'wrong'}`;
-        let correctDisplay = '';
-        if (!isCorrect) {
-            if (q.type === '单选题') {
-                const correctOpt = q.options.find(o => o.startsWith(q.answer+'.') || o.startsWith(q.answer+'、'));
-                correctDisplay = `<span class="correct-ans">正确答案：${correctOpt || q.answer}</span>`;
-            } else if (q.type === '判断题') {
-                correctDisplay = `<span class="correct-ans">正确答案：${q.answer}</span>`;
-            }
+        let extra = '';
+        if (!isCorrect && q) {
+            const full = getFullAnswer(q);
+            extra = `<span class="correct-ans">正确答案：${full}</span>`;
         }
-        fb.innerHTML = isCorrect ? '✅ 回答正确！' : `❌ 回答错误。${correctDisplay}`;
+        fb.innerHTML = isCorrect ? '✅ 回答正确！' : `❌ 回答错误。${extra}`;
     }
 
     function updateProgress() {
         const total = questions.length;
-        const answered = answeredIds.size;
+        let answered = 0;
+        questions.forEach(q => {
+            if (q.options && q.options.length > 0) {
+                if (userAnswers[q.id]) answered++;
+            } else {
+                answered++;
+            }
+        });
         const pct = total ? (answered / total * 100) : 0;
         progressBar.style.width = `${pct}%`;
         progressText.textContent = `${answered} / ${total} 题`;
 
-        // 统计正确/错误（仅对单选/判断）
+        // 更新顶部导航栏进度
+        const navP = document.getElementById('navProgress');
+        if (navP) navP.textContent = Math.round(pct) + '%';
+
         let correct = 0, wrong = 0;
         questions.forEach(q => {
-            if (['单选题','判断题'].includes(q.type)) {
-                const ans = userAnswers[q.id];
-                if (ans) {
-                    if (checkAnswer(q.id, ans)) correct++;
-                    else wrong++;
-                }
+            if (q.options && q.options.length > 0 && userAnswers[q.id]) {
+                if (checkAnswer(q.id, userAnswers[q.id])) correct++;
+                else wrong++;
             }
         });
         correctCountEl.textContent = `✅ 正确 ${correct}`;
         wrongCountEl.textContent = `❌ 错误 ${wrong}`;
     }
 
-    // 重置
     function resetAll() {
         userAnswers = {};
         answeredIds = new Set();
-        // 清空所有radio
         document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
         renderQuestions();
         updateProgress();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 首次渲染
     renderQuestions();
-
-    // 事件绑定
     document.getElementById('resetBtn').addEventListener('click', resetAll);
     document.getElementById('scrollToTopBtn').addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-
-    // 对名词解释/简答/计算/分析 直接标记为已阅（不计对错），但用户可查看
-    // 已在render中处理
 </script>
 
 </body>
